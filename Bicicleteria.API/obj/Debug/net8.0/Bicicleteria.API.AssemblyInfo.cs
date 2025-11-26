@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Bicicleteria.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b082a4b80a87989be83b0a406ead0c462d21acfd")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5833c34b7c5c34bc86dc312828efb2d9b8f95614")]
 [assembly: System.Reflection.AssemblyProductAttribute("Bicicleteria.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Bicicleteria.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
