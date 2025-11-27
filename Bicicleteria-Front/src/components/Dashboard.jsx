@@ -1,89 +1,86 @@
-// src/components/Dashboard.jsx
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { DollarSign, ShoppingBag, Users, AlertTriangle, Package } from 'lucide-react';
+import { useAuth } from '../context/AuthContext'; // Importamos el contexto para saber si hay error de auth
 
 const Dashboard = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { logout } = useAuth(); // Para cerrar sesión si el token venció
 
-  // URL de tu API (Ajusta el puerto si es necesario, ej: 7222 para https)
-  const API_URL = 'https://localhost:7222/api/Dashboard';
+  // Asegúrate de usar el mismo puerto que en AuthContext (5028 http o 7222 https)
+  const API_URL = 'http://localhost:2777/api/Dashboard'; 
 
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        // NOTA: Cuando tengas Login, aquí iría: headers: { Authorization: `Bearer ${token}` }
-        // Por ahora intentaremos la petición directa (asegúrate de permitir CORS en el back)
+        // La petición GET enviará automáticamente el token gracias a AuthContext
         const response = await axios.get(API_URL);
         setData(response.data);
+        setError(null);
       } catch (err) {
-        console.error(err);
-        // Si falla (ej. por falta de permisos/token), mostramos datos falsos de prueba
-        // para que puedas ver el diseño mientras arreglamos el login.
-        setError('No se pudo conectar (¿Falta Login?). Mostrando datos de prueba...');
-        
-        // DATOS DE PRUEBA (SOLO PARA DISEÑO)
-        setData({
-          totalVendidoMes: 150000,
-          cantidadVentasMes: 24,
-          clientesNuevosMes: 5,
-          ultimasVentas: [
-            { id: 1, fecha: '27/11/2025', cliente: 'Juan Perez', total: 12000, estado: 'Entregado' },
-            { id: 2, fecha: '26/11/2025', cliente: 'Ana Gomez', total: 4500, estado: 'Pendiente' },
-          ],
-          productosBajoStock: [
-             { descripcion: 'Cámara Rodado 29', codigo: 'CAM-29', stock: 2, tipo: 'Repuesto' }
-          ]
-        });
+        console.error("Error cargando dashboard:", err);
+        if (err.response && err.response.status === 401) {
+            setError('Tu sesión ha expirado. Por favor ingresa nuevamente.');
+            // Opcional: logout(); 
+        } else {
+            setError('Error al conectar con el servidor.');
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchDashboard();
-  }, []);
+  }, [logout]);
 
-  if (loading) return <div className="p-10 text-center text-xl">Cargando métricas...</div>;
+  if (loading) return (
+    <div className="flex justify-center items-center h-screen text-gray-500">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mr-2"></div>
+      Cargando métricas...
+    </div>
+  );
+
+  if (error) return (
+    <div className="p-8 text-center">
+        <div className="bg-red-100 text-red-700 p-4 rounded-lg inline-block">
+            <AlertTriangle className="inline-block mr-2 mb-1"/>
+            {error}
+        </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-800 mb-8">Panel de Administración - El Cairo</h1>
-        
-        {error && (
-           <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6">
-             <p className="font-bold">Modo Diseño</p>
-             <p>{error}</p>
-           </div>
-        )}
+        <h1 className="text-3xl font-bold text-gray-800 mb-8">Panel de Control</h1>
 
-        {/* 1. Tarjetas Superiores */}
+        {/* 1. Tarjetas de Resumen */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card 
             icon={<DollarSign size={28} className="text-green-600" />} 
             title="Ventas del Mes" 
-            value={`$${data?.totalVendidoMes?.toLocaleString()}`} 
+            value={data ? `$${data.totalVendidoMes.toLocaleString()}` : "$0"} 
             color="bg-green-100"
           />
           <Card 
             icon={<ShoppingBag size={28} className="text-blue-600" />} 
             title="Pedidos Realizados" 
-            value={data?.cantidadVentasMes} 
+            value={data?.cantidadVentasMes || 0} 
             color="bg-blue-100"
           />
           <Card 
             icon={<Users size={28} className="text-purple-600" />} 
             title="Nuevos Clientes" 
-            value={data?.clientesNuevosMes} 
+            value={data?.clientesNuevosMes || 0} 
             color="bg-purple-100"
           />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           
-          {/* 2. Tabla Últimas Ventas */}
+          {/* 2. Últimas Ventas */}
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <h2 className="text-xl font-bold mb-4 flex items-center text-gray-700">
               <Package className="mr-2" size={20}/> Últimas Ventas
@@ -99,19 +96,25 @@ const Dashboard = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y">
-                  {data?.ultimasVentas?.map((venta) => (
-                    <tr key={venta.id} className="hover:bg-gray-50 transition">
-                      <td className="p-3 text-gray-600">{venta.fecha}</td>
-                      <td className="p-3 font-medium text-gray-800">{venta.cliente}</td>
-                      <td className="p-3 font-bold text-gray-700">${venta.total.toLocaleString()}</td>
-                      <td className="p-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-semibold
-                          ${venta.estado === 'Entregado' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                          {venta.estado}
-                        </span>
-                      </td>
+                  {data?.ultimasVentas?.length > 0 ? (
+                    data.ultimasVentas.map((venta) => (
+                      <tr key={venta.id} className="hover:bg-gray-50 transition">
+                        <td className="p-3 text-gray-600">{venta.fecha}</td>
+                        <td className="p-3 font-medium text-gray-800">{venta.cliente}</td>
+                        <td className="p-3 font-bold text-gray-700">${venta.total.toLocaleString()}</td>
+                        <td className="p-3">
+                          <span className={`px-2 py-1 rounded-full text-xs font-semibold
+                            ${venta.estado === 'Entregado' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                            {venta.estado}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="4" className="p-4 text-center text-gray-400">No hay ventas recientes</td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
@@ -129,14 +132,18 @@ const Dashboard = () => {
                     <p className="font-bold text-gray-800">{prod.descripcion}</p>
                     <p className="text-xs text-gray-500">Cód: {prod.codigo} | {prod.tipo}</p>
                   </div>
-                  <div className="text-center bg-white px-3 py-1 rounded shadow-sm">
+                  <div className="text-center bg-white px-3 py-1 rounded shadow-sm border border-red-100">
                     <span className="text-xl font-bold text-red-600 block leading-none">{prod.stock}</span>
                     <span className="text-[10px] text-gray-400 uppercase font-bold">Unidades</span>
                   </div>
                 </div>
               ))}
+              
               {(!data?.productosBajoStock || data.productosBajoStock.length === 0) && (
-                <p className="text-green-600 text-center py-4 bg-green-50 rounded">¡Stock saludable!</p>
+                <div className="flex flex-col items-center justify-center h-32 text-green-600 bg-green-50 rounded-lg">
+                    <Package size={32} className="mb-2 opacity-50"/>
+                    <p className="font-medium">¡Stock Saludable!</p>
+                </div>
               )}
             </div>
           </div>
@@ -147,7 +154,7 @@ const Dashboard = () => {
   );
 };
 
-// Componente auxiliar para las tarjetas de arriba
+// Componente auxiliar para tarjetas
 const Card = ({ icon, title, value, color }) => (
   <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center transition hover:shadow-md">
     <div className={`p-4 rounded-full mr-4 ${color}`}>
