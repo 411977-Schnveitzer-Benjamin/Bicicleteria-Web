@@ -3,19 +3,22 @@ using Bicicleteria.API.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.OpenApi.Models; // <--- ESTA ES LA LÍNEA QUE TE FALTA
+using Microsoft.OpenApi.Models;
+// --- AGREGADOS NUEVOS ---
+using Bicicleteria.API.Interfaces;
+using Bicicleteria.API.Repositories;
+// ------------------------
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- 1. SERVICIOS ---
+// 1. SERVICIOS
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-// Configurar Swagger con seguridad
+// Swagger con seguridad
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Bicicleteria API", Version = "v1" });
-
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Autorización. Escribe 'Bearer' [espacio] y tu token.",
@@ -24,7 +27,6 @@ builder.Services.AddSwaggerGen(c =>
         Type = SecuritySchemeType.ApiKey,
         Scheme = "Bearer"
     });
-
     c.AddSecurityRequirement(new OpenApiSecurityRequirement()
     {
         {
@@ -44,37 +46,14 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// Configurar Base de Datos
+// Base de Datos
 builder.Services.AddDbContext<BicicleteriaWebContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Configurar JWT
+// --- INYECCIÓN DE REPOSITORIOS (NUEVO) ---
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+// ----------------------------------------
+
+// JWT
 var key = builder.Configuration["Jwt:Key"];
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key!)),
-            ValidateIssuer = false,
-            ValidateAudience = false
-        };
-    });
-
-var app = builder.Build();
-
-// --- 2. MIDDLEWARES ---
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
-app.UseAuthentication(); // Importante
-app.UseAuthorization();  // Importante
-
-app.MapControllers();
-
-app.Run();
+if (string.IsNullOrEmpty(key)) throw new Exception("Falta Jwt:Key en appsettings.json");

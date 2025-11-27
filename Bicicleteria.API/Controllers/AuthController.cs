@@ -31,18 +31,16 @@ namespace Bicicleteria.API.Controllers
 
             string passwordHash = EncriptarPassword(request.Password);
 
-            // Buscamos el rol de Cliente
-            // NOTA: Ajusté 'NombreRol' por si acaso, verifica si en Role.cs es NombreRol o Nombre
             var rolCliente = await _context.Roles.FirstOrDefaultAsync(r => r.NombreRol == "Cliente");
-            int rolIdDefecto = rolCliente?.RolId ?? 2; // <--- CAMBIO: RolId (d minúscula)
+            int rolIdDefecto = rolCliente?.RolId ?? 2;
 
             var nuevoUsuario = new Usuario
             {
                 NombreCompleto = request.Nombre,
                 Email = request.Email,
                 PasswordHash = passwordHash,
-                RolId = rolIdDefecto, // <--- CAMBIO: RolId (d minúscula)
-                Dni = request.Dni,    // Verifica si en Usuario.cs es Dni o Dni (normalmente es Dni)
+                RolId = rolIdDefecto,
+                Dni = request.Dni,  
                 Telefono = request.Telefono,
                 FechaRegistro = DateTime.Now,
                 Activo = true
@@ -58,7 +56,7 @@ namespace Bicicleteria.API.Controllers
         public async Task<ActionResult<string>> Login(LoginDTO request)
         {
             var usuario = await _context.Usuarios
-                .Include(u => u.Rol) // <--- Si te marca error aquí, cambia 'Rol' por 'RolNavigation'
+                .Include(u => u.Rol) 
                 .FirstOrDefaultAsync(u => u.Email == request.Email);
 
             if (usuario == null) return Unauthorized("Usuario no encontrado.");
@@ -74,12 +72,9 @@ namespace Bicicleteria.API.Controllers
         {
             var claims = new List<Claim>
             {
-                // CAMBIO: UsuarioId (d minúscula)
                 new Claim(ClaimTypes.NameIdentifier, usuario.UsuarioId.ToString()),
                 new Claim(ClaimTypes.Name, usuario.Email),
                 
-                // CAMBIO: Verificamos si la propiedad de navegación es 'Rol' o 'RolNavigation'
-                // Si te sigue dando error en 'Rol?', prueba cambiarlo a 'RolNavigation?'
                 new Claim(ClaimTypes.Role, usuario.Rol?.NombreRol ?? "Cliente")
             };
 
@@ -102,6 +97,12 @@ namespace Bicicleteria.API.Controllers
                 var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
                 return Convert.ToBase64String(bytes);
             }
+        }
+
+        [HttpPost("google")]
+        public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginDTO request)
+        {
+            return StatusCode(501, "La autenticación con Google se configurará en la siguiente etapa.");
         }
     }
 }
