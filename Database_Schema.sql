@@ -267,3 +267,4 @@ PRINT '¡Operación completada! Base de datos actualizada.';
    ===================================================== */
 
 INSERT INTO Roles (NombreRol) VALUES ('Administrador'), ('Empleado'), ('Cliente');
+

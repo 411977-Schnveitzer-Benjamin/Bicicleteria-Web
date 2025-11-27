@@ -65,6 +65,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddCors(o => o.AddPolicy("PermitirTodo", p => p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 
+// Habilitar CORS para que React pueda pedir datos
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("NuevaPolitica", app =>
+    {
+        app.AllowAnyOrigin()   // En producción cambiar por la URL real
+           .AllowAnyHeader()
+           .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
 // 2. MIDDLEWARES
@@ -76,6 +87,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors("PermitirTodo");
+app.UseRouting();
+
+app.UseCors("NuevaPolitica");
 app.UseAuthentication();
 app.UseAuthorization();
 
