@@ -1,21 +1,17 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { ShoppingCart, User, LogOut, Menu } from 'lucide-react';
+import { ShoppingCart, LogOut, Menu, X } from 'lucide-react';
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // LOGICA IMPORTANTE: Detectar si es Admin
-  // .NET a veces guarda el rol con nombres raros, revisamos todas las opciones:
+  // Lógica Admin
   const roleName = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role";
-  
-  const isAdmin = 
-    user?.role === 'Administrador' || 
-    user?.Role === 'Administrador' || 
-    user?.[roleName] === 'Administrador';
+  const isAdmin = user?.role === 'Administrador' || user?.Role === 'Administrador' || user?.[roleName] === 'Administrador';
 
   const handleLogout = () => {
     logout();
@@ -23,113 +19,114 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-gray-900 text-white shadow-lg sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
-          
-          {/* Logo */}
-          <Link to="/" className="text-xl font-bold tracking-wider text-yellow-500 hover:text-yellow-400 transition">
-            EL CAIRO
-          </Link>
-
-          {/* Menú Escritorio */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="hover:text-yellow-400 transition">Inicio</Link>
+    <>
+      <nav className="fixed top-0 left-0 right-0 z-50 px-4 py-4">
+        <div className="max-w-7xl mx-auto">
+          {/* Barra Flotante Glassmorphism */}
+          <div className="glass-panel rounded-2xl px-6 py-3 flex justify-between items-center shadow-2xl shadow-cairo-red/5">
             
-            {/* Dropdown Productos */}
-            <div className="relative group h-full flex items-center">
-              <button className="hover:text-yellow-400 flex items-center transition focus:outline-none">
-                Productos <span className="ml-1 text-xs">▼</span>
-              </button>
-              {/* Menú desplegable */}
-              <div className="absolute top-10 left-0 mt-2 w-48 bg-white rounded-md shadow-xl py-2 hidden group-hover:block text-gray-800 border border-gray-200 z-50">
-                <Link to="/productos/bicis" className="block px-4 py-2 hover:bg-gray-100 transition">Bicicletas</Link>
-                <Link to="/productos/repuestos" className="block px-4 py-2 hover:bg-gray-100 transition">Repuestos</Link>
-                <Link to="/productos/accesorios" className="block px-4 py-2 hover:bg-gray-100 transition">Accesorios</Link>
-              </div>
+            {/* --- LOGO LIMPIO --- */}
+            <Link to="/" className="flex items-center">
+              <img 
+                src="/img/Logo.png" 
+                alt="El Cairo Logo" 
+                // CAMBIOS AQUÍ:
+                // 1. h-14 w-auto: Altura fija un poco más grande, ancho automático para no deformar.
+                // 2. Quitados: rounded-full, border, object-cover, shadow-lg (caja).
+                // 3. Añadidos: hover:scale-105 (crece sutilmente) y hover:drop-shadow (resplandor naranja).
+                className="h-14 w-auto transition-all duration-500 hover:scale-105 hover:drop-shadow-[0_0_15px_rgba(242,100,25,0.6)]" 
+              />
+            </Link>
+            {/* ------------------- */}
+
+            {/* MENÚ ESCRITORIO */}
+            <div className="hidden md:flex items-center space-x-8 font-medium text-sm">
+              {['Inicio', 'Productos', 'Nosotros'].map((item) => (
+                <Link 
+                  key={item} 
+                  to={item === 'Inicio' ? '/' : `/${item.toLowerCase()}`} 
+                  className="relative text-gray-300 hover:text-white transition-colors group"
+                >
+                  {item}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-cairo-orange transition-all group-hover:w-full"/>
+                </Link>
+              ))}
+
+              {isAdmin && (
+                <Link to="/dashboard" className="text-cairo-red font-bold uppercase tracking-wider text-xs border border-cairo-red/30 px-3 py-1 rounded-full hover:bg-cairo-red hover:text-white transition-all">
+                  Dashboard
+                </Link>
+              )}
             </div>
 
-            {/* BOTÓN DASHBOARD (SOLO VISIBLE SI ES ADMIN) */}
-            {isAdmin && (
-              <Link 
-                to="/dashboard" 
-                className="flex items-center text-red-400 font-semibold hover:text-red-300 border border-red-500 px-3 py-1 rounded transition hover:bg-red-500/10"
-              >
-                Dashboard
-              </Link>
-            )}
-          </div>
-
-          {/* Acciones de Usuario (Derecha) */}
-          <div className="hidden md:flex items-center space-x-6">
-            {isAuthenticated ? (
-              <>
-                <div className="flex items-center space-x-2 border-r border-gray-700 pr-4">
-                  <User size={18} className="text-yellow-500" />
-                  <span className="text-sm font-medium text-gray-300">
-                    {user?.unique_name || user?.sub || "Usuario"}
-                  </span>
+            {/* ACCIONES */}
+            <div className="hidden md:flex items-center space-x-4">
+              {isAuthenticated ? (
+                <div className="flex items-center gap-4">
+                  <div className="text-right hidden lg:block">
+                    <p className="text-xs text-gray-400">Hola,</p>
+                    <p className="text-sm font-bold text-cairo-yellow leading-none">
+                      {user?.unique_name || "Ciclista"}
+                    </p>
+                  </div>
+                  <button onClick={handleLogout} className="p-2 hover:bg-white/10 rounded-full transition-colors" title="Salir">
+                    <LogOut size={18} className="text-gray-300 hover:text-cairo-red"/>
+                  </button>
                 </div>
-                <button 
-                  onClick={handleLogout} 
-                  className="text-gray-400 hover:text-white transition flex items-center text-sm"
-                  title="Cerrar Sesión"
-                >
-                  <LogOut size={18} className="mr-1" /> Salir
-                </button>
-              </>
-            ) : (
-              <div className="space-x-3 text-sm font-medium">
-                <Link to="/login" className="hover:text-yellow-400 transition">Ingresar</Link>
-                <Link to="/registro" className="px-4 py-2 bg-yellow-500 text-gray-900 rounded hover:bg-yellow-400 transition shadow-md">
-                  Registrarse
-                </Link>
-              </div>
-            )}
-            
-            {/* Carrito */}
-            <button className="relative p-2 hover:bg-gray-800 rounded-full transition group">
-              <ShoppingCart size={22} className="group-hover:text-yellow-400 transition"/>
-              <span className="absolute top-0 right-0 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
-                0
-              </span>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <Link to="/login" className="text-sm font-bold text-white hover:text-cairo-yellow">Login</Link>
+                  <Link to="/registro" className="bg-white text-black px-4 py-1.5 rounded-full text-sm font-bold hover:bg-cairo-yellow transition-colors">
+                    Registro
+                  </Link>
+                </div>
+              )}
+
+              <button className="relative p-2 bg-white/5 rounded-full hover:bg-cairo-orange/20 transition-colors group">
+                <ShoppingCart size={20} className="text-white group-hover:text-cairo-orange transition-colors"/>
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-cairo-red rounded-full text-[10px] flex items-center justify-center font-bold">0</span>
+              </button>
+            </div>
+
+            {/* Botón Móvil */}
+            <button className="md:hidden text-white" onClick={() => setIsMenuOpen(true)}>
+              <Menu size={28} />
             </button>
           </div>
-
-          {/* Botón Menú Móvil */}
-          <div className="md:hidden">
-             <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-gray-300 hover:text-white">
-               <Menu size={28} />
-             </button>
-          </div>
         </div>
-      </div>
-      
-      {/* Menú Móvil (Desplegable) */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-gray-800 px-4 pt-4 pb-6 space-y-3 shadow-inner">
-          <Link to="/" className="block py-2 text-gray-300 hover:text-white border-b border-gray-700">Inicio</Link>
-          <Link to="/productos" className="block py-2 text-gray-300 hover:text-white border-b border-gray-700">Productos</Link>
-          
-          {isAdmin && (
-            <Link to="/dashboard" className="block py-2 text-red-400 font-bold border-b border-gray-700">
-              ⚡ Ir al Dashboard
-            </Link>
-          )}
+      </nav>
 
-          {!isAuthenticated ? (
-             <div className="pt-2 flex flex-col space-y-2">
-               <Link to="/login" className="block text-center py-2 border border-gray-600 rounded text-gray-300">Iniciar Sesión</Link>
-               <Link to="/registro" className="block text-center py-2 bg-yellow-500 text-gray-900 rounded font-bold">Registrarse</Link>
-             </div>
-          ) : (
-             <button onClick={handleLogout} className="w-full text-left py-2 text-gray-400 hover:text-white flex items-center">
-               <LogOut size={18} className="mr-2"/> Cerrar Sesión
-             </button>
-          )}
-        </div>
-      )}
-    </nav>
+      {/* MENÚ MÓVIL */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed inset-0 z-[60] bg-cairo-dark/95 backdrop-blur-xl flex flex-col items-center justify-center space-y-8"
+          >
+            <button onClick={() => setIsMenuOpen(false)} className="absolute top-6 right-6 text-white hover:text-cairo-red">
+              <X size={40} />
+            </button>
+            
+            {/* Logo grande limpio en móvil también */}
+            <img 
+              src="/img/Logo.png" 
+              alt="El Cairo Logo" 
+              className="h-28 w-auto mb-6 hover:drop-shadow-[0_0_25px_rgba(242,100,25,0.8)] transition-all duration-500" 
+            />
+
+            <Link to="/" onClick={() => setIsMenuOpen(false)} className="font-brand text-5xl hover:text-cairo-yellow transition-colors">INICIO</Link>
+            <Link to="/productos" onClick={() => setIsMenuOpen(false)} className="font-brand text-5xl hover:text-cairo-orange transition-colors">PRODUCTOS</Link>
+            {isAuthenticated ? (
+               <button onClick={() => { handleLogout(); setIsMenuOpen(false); }} className="font-brand text-5xl text-gray-500 hover:text-cairo-red transition-colors">SALIR</button>
+            ) : (
+               <Link to="/login" onClick={() => setIsMenuOpen(false)} className="font-brand text-5xl text-cairo-red hover:text-white transition-colors">INGRESAR</Link>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 

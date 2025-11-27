@@ -1,27 +1,37 @@
-/* 1. Importar las fuentes de Google */
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;500;600;700&display=swap');
-
-/* 2. Importar Tailwind 4 */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
-/* 3. Definir el TEMA personalizado (Esto reemplaza a tailwind.config.js) */
 @theme {
-  /* Paleta de Colores "El Cairo" */
-  --color-cairo-mustard: #D99C35;       /* Amarillo mostaza del logo */
-  --color-cairo-mustard-dark: #B37E26;  /* Para hovers */
-  --color-cairo-brown: #3A2B1A;         /* Marrón oscuro texto/fondo */
-  --color-cairo-cream: #F4EEDD;         /* Beige claro secundario */
-  --color-cairo-cream-light: #FFFDF5;   /* Fondo principal casi blanco */
+  /* Paleta "El Cairo Racing" */
+  --color-cairo-red: #D92525;      /* Rojo Intenso */
+  --color-cairo-orange: #F26419;   /* Naranja Vibrante */
+  --color-cairo-yellow: #F6AE2D;   /* Amarillo Sol */
+  --color-cairo-dark: #0a0a0a;     /* Negro Profundo */
+  --color-cairo-gray: #171717;     /* Gris Oscuro (Tarjetas) */
+  --color-cairo-light: #ededed;    /* Blanco Roto (Texto) */
 
-  /* Fuentes personalizadas */
-  --font-sans: "Montserrat", sans-serif;   /* Fuente por defecto */
-  --font-brand: "Bebas Neue", sans-serif;  /* Fuente para títulos */
+  /* Fuentes */
+  --font-sans: "Manrope", sans-serif;  /* Moderna y geométrica */
+  --font-brand: "Bebas Neue", sans-serif; /* Títulos impactantes */
+
+  /* Animaciones Personalizadas (Tipo Magic UI) */
+  @keyframes shine {
+    from { background-position: 0 0; }
+    to { background-position: -200% 0; }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
+  }
+  --animate-shine: shine 2s linear infinite;
+  --animate-marquee: marquee 20s linear infinite;
 }
 
-/* 4. Aplicar fuentes base automáticamente */
 @layer base {
   html {
     font-family: var(--font-sans);
+    background-color: var(--color-cairo-dark);
+    color: var(--color-cairo-light);
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-brand);
@@ -29,9 +39,16 @@
   }
 }
 
-/* 5. Crear clases personalizadas (botones, etc.) */
 @layer components {
-  .btn-cairo {
-    @apply bg-cairo-mustard text-white font-bold py-2 px-4 rounded transition hover:bg-cairo-mustard-dark cursor-pointer;
+  /* Botón con gradiente animado */
+  .btn-fire {
+    @apply relative overflow-hidden rounded-full bg-gradient-to-r from-cairo-red via-cairo-orange to-cairo-yellow px-8 py-3 font-bold text-white shadow-lg transition-transform hover:scale-105 active:scale-95 cursor-pointer;
+    background-size: 200% auto;
+    animation: shine 3s linear infinite;
+  }
+  
+  /* Efecto Glassmorphism */
+  .glass-panel {
+    @apply bg-white/5 backdrop-blur-md border border-white/10;
   }
 }
