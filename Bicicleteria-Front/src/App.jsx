@@ -52,9 +52,6 @@ const Home = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <span className="inline-block py-1 px-3 rounded-full bg-white/5 border border-white/10 text-cairo-yellow text-xs font-bold uppercase tracking-widest mb-4">
-            Nueva Colección 2025
-          </span>
           <h1 className="text-7xl md:text-9xl font-brand leading-none mb-6">
             <span className="text-white">ROMPÉ TUS</span> <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-cairo-red via-cairo-orange to-cairo-yellow animate-shine bg-[length:200%_auto]">

@@ -1,36 +1,41 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
 import { 
   LayoutDashboard, Package, ShoppingCart, Users, LogOut, ArrowLeft, 
-  Settings, DollarSign, Activity, AlertTriangle 
+  Settings, DollarSign, Activity, AlertTriangle, Search, Filter, Plus, 
+  ArrowUpDown, Edit, Trash2, X, CheckSquare, Square, Save, Store, 
+  Truck, Bell, Shield, RefreshCw, Info, MoreVertical, Loader
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext'; 
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+
+// --- URL BASE (HTTPS) ---
+const BASE_URL = 'https://localhost:7222/api';
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('estadisticas'); 
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const API_URL = 'https://localhost:7222/api/Dashboard'; 
-
+  // Estado para Estadísticas
+  const [statsData, setStatsData] = useState(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [statsError, setStatsError] = useState(null);
+  
   useEffect(() => {
-    const fetchDashboard = async () => {
+    const fetchStats = async () => {
       try {
-        const response = await axios.get(API_URL);
-        setData(response.data);
+        const response = await axios.get(`${BASE_URL}/Dashboard`);
+        setStatsData(response.data);
       } catch (err) {
-        if (err.response?.status === 401) setError("Sesión expirada.");
-        else setError("No se pudo conectar con el servidor.");
+        if (err.response?.status === 401) setStatsError("Sesión expirada.");
+        else setStatsError("No se pudo conectar con el servidor.");
       } finally {
-        setLoading(false);
+        setStatsLoading(false);
       }
     };
-    fetchDashboard();
+    fetchStats();
   }, []);
 
   const handleLogout = () => {
@@ -38,114 +43,67 @@ const Dashboard = () => {
     navigate('/login');
   };
 
-  // Obtenemos el nombre/email del token (sin hardcodear)
-  // Nota: En tu backend configuraste el email como 'unique_name'
-  const displayUser = user?.unique_name || user?.sub || "Usuario";
+  const displayName = user?.Nombre || user?.unique_name || "Usuario";
+  const displayEmail = user?.unique_name || user?.email || "sin-email@elcairo.com";
 
   return (
     <div className="flex h-screen bg-cairo-dark overflow-hidden">
       
-      {/* --- SIDEBAR (Menú Izquierdo) --- */}
+      {/* --- SIDEBAR --- */}
       <aside className="w-64 bg-black/40 border-r border-white/10 flex flex-col justify-between p-6 relative z-20 backdrop-blur-xl">
-        
         <div>
-          {/* Botón Volver */}
           <Link to="/" className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-12 group">
             <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform"/>
             <span className="text-sm font-bold uppercase tracking-wider">Volver a la Tienda</span>
           </Link>
           
-          {/* ELIMINADO: El bloque de logo "EC" y título "ADMIN" que no querías */}
-
-          {/* Menú de Navegación */}
           <nav className="space-y-2">
-            <SidebarItem 
-              icon={<LayoutDashboard size={20}/>} 
-              label="Estadísticas" 
-              active={activeTab === 'estadisticas'} 
-              onClick={() => setActiveTab('estadisticas')}
-            />
-            <SidebarItem 
-              icon={<Package size={20}/>} 
-              label="Productos" 
-              active={activeTab === 'productos'} 
-              onClick={() => setActiveTab('productos')}
-            />
-            <SidebarItem 
-              icon={<ShoppingCart size={20}/>} 
-              label="Ordenes" 
-              active={activeTab === 'ordenes'} 
-              onClick={() => setActiveTab('ordenes')}
-            />
-            <SidebarItem 
-              icon={<Users size={20}/>} 
-              label="Usuarios" 
-              active={activeTab === 'usuarios'} 
-              onClick={() => setActiveTab('usuarios')}
-            />
-            <SidebarItem 
-              icon={<Settings size={20}/>} 
-              label="Configuración" 
-              active={activeTab === 'config'} 
-              onClick={() => setActiveTab('config')}
-            />
+            <SidebarItem icon={<LayoutDashboard size={20}/>} label="Estadísticas" active={activeTab === 'estadisticas'} onClick={() => setActiveTab('estadisticas')}/>
+            <SidebarItem icon={<Package size={20}/>} label="Productos" active={activeTab === 'productos'} onClick={() => setActiveTab('productos')}/>
+            <SidebarItem icon={<ShoppingCart size={20}/>} label="Ordenes" active={activeTab === 'ordenes'} onClick={() => setActiveTab('ordenes')}/>
+            <SidebarItem icon={<Users size={20}/>} label="Usuarios" active={activeTab === 'usuarios'} onClick={() => setActiveTab('usuarios')}/>
+            <SidebarItem icon={<Settings size={20}/>} label="Configuración" active={activeTab === 'config'} onClick={() => setActiveTab('config')}/>
           </nav>
         </div>
 
-        {/* --- PERFIL DE USUARIO (Nuevo Diseño) --- */}
         <div className="pt-6 border-t border-white/10 mt-auto">
-          <div className="flex items-center gap-3 p-2 rounded-xl bg-white/5 border border-white/5 hover:border-cairo-orange/30 transition-colors">
-             
-             {/* Inicial del Usuario */}
-             <div className="h-10 w-10 min-w-[2.5rem] rounded-full bg-cairo-orange/20 border border-cairo-orange/50 flex items-center justify-center text-cairo-orange font-bold shadow-sm">
-                {displayUser.charAt(0).toUpperCase()}
+          <div className="flex items-center gap-3 p-2 rounded-xl bg-white/5 border border-white/5 hover:border-cairo-orange/30 transition-colors group">
+             <div className="h-10 w-10 min-w-[2.5rem] rounded-full bg-cairo-orange/20 border border-cairo-orange/50 flex items-center justify-center text-cairo-orange font-bold shadow-sm group-hover:scale-105 transition-transform">
+                {displayName.charAt(0).toUpperCase()}
              </div>
-             
-             {/* Datos Reales */}
              <div className="flex-1 overflow-hidden">
-               <p className="text-xs font-bold text-white truncate" title={displayUser}>
-                 {displayUser}
-               </p>
-               <p className="text-[10px] text-cairo-orange font-bold uppercase tracking-wider truncate">
-                 Administrador
-               </p>
+               <p className="text-xs font-bold text-white truncate" title={displayName}>{displayName}</p>
+               <p className="text-[10px] text-gray-400 font-medium truncate group-hover:text-gray-300 transition-colors" title={displayEmail}>{displayEmail}</p>
              </div>
-
-             {/* Botón Salir (Icono) */}
-             <button 
-                onClick={handleLogout} 
-                className="p-2 text-gray-400 hover:text-cairo-red hover:bg-white/10 rounded-lg transition-all"
-                title="Cerrar Sesión"
-             >
+             <button onClick={handleLogout} className="p-2 text-gray-500 hover:text-cairo-red hover:bg-white/10 rounded-lg transition-all" title="Cerrar Sesión">
                 <LogOut size={18}/>
              </button>
           </div>
         </div>
-
       </aside>
 
-      {/* --- AREA PRINCIPAL (Contenido) --- */}
+      {/* --- AREA PRINCIPAL --- */}
       <main className="flex-1 overflow-y-auto relative p-8">
-        {/* Fondo decorativo */}
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-cairo-red/5 rounded-full blur-[120px] -z-10" />
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-cairo-yellow/5 rounded-full blur-[120px] -z-10" />
 
         <div className="max-w-6xl mx-auto">
           
+          {/* 1. VISTA DE ESTADÍSTICAS */}
           {activeTab === 'estadisticas' && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
               <h2 className="text-4xl font-brand text-white mb-8 border-b border-white/10 pb-4">Resumen General</h2>
               
-              {loading ? (
-                 <div className="text-white">Cargando datos...</div>
-              ) : error ? (
-                 <div className="text-cairo-red p-4 border border-cairo-red/20 rounded-lg bg-cairo-red/5">{error}</div>
+              {statsLoading ? (
+                 <div className="flex items-center gap-2 text-white"><Loader className="animate-spin"/> Cargando datos...</div>
+              ) : statsError ? (
+                 <div className="text-cairo-red p-4 border border-cairo-red/20 rounded-lg bg-cairo-red/5">{statsError}</div>
               ) : (
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <StatCard title="Ventas Mensuales" value={`$${data?.totalVendidoMes.toLocaleString()}`} icon={<DollarSign/>} color="text-green-400" />
-                    <StatCard title="Pedidos" value={data?.cantidadVentasMes} icon={<ShoppingCart/>} color="text-cairo-yellow" />
-                    <StatCard title="Clientes Nuevos" value={data?.clientesNuevosMes} icon={<Users/>} color="text-cairo-orange" />
+                    <StatCard title="Ventas Mensuales" value={`$${statsData?.totalVendidoMes.toLocaleString()}`} icon={<DollarSign/>} color="text-green-400" />
+                    <StatCard title="Pedidos" value={statsData?.cantidadVentasMes} icon={<ShoppingCart/>} color="text-cairo-yellow" />
+                    <StatCard title="Clientes Nuevos" value={statsData?.clientesNuevosMes} icon={<Users/>} color="text-cairo-orange" />
                   </div>
 
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -154,16 +112,10 @@ const Dashboard = () => {
                         <Activity size={20} className="text-cairo-yellow"/> Últimas Ventas
                       </h3>
                       <div className="space-y-3">
-                        {data?.ultimasVentas.map(v => (
+                        {statsData?.ultimasVentas.map(v => (
                           <div key={v.id} className="flex justify-between items-center p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
-                            <div>
-                              <p className="text-sm font-bold text-white">{v.cliente}</p>
-                              <p className="text-xs text-gray-500">{v.fecha}</p>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-sm font-bold text-green-400">${v.total.toLocaleString()}</p>
-                              <span className="text-[10px] uppercase text-gray-400">{v.estado}</span>
-                            </div>
+                            <div><p className="text-sm font-bold text-white">{v.cliente}</p><p className="text-xs text-gray-500">{v.fecha}</p></div>
+                            <div className="text-right"><p className="text-sm font-bold text-green-400">${v.total.toLocaleString()}</p><span className="text-[10px] uppercase text-gray-400">{v.estado}</span></div>
                           </div>
                         ))}
                       </div>
@@ -175,18 +127,13 @@ const Dashboard = () => {
                         <AlertTriangle size={20}/> Alertas de Stock
                       </h3>
                       <div className="space-y-3">
-                        {data?.productosBajoStock.map((p, i) => (
+                        {statsData?.productosBajoStock.map((p, i) => (
                           <div key={i} className="flex justify-between items-center p-3 bg-black/20 border border-white/5 rounded-lg">
-                            <div>
-                              <p className="text-sm font-bold text-gray-200">{p.descripcion}</p>
-                              <p className="text-[10px] font-bold text-cairo-orange uppercase">{p.tipo} • {p.codigo}</p>
-                            </div>
-                            <div className="px-3 py-1 bg-cairo-red/10 border border-cairo-red/20 rounded text-cairo-red font-bold">
-                              {p.stock} <span className="text-[8px]">Unid.</span>
-                            </div>
+                            <div><p className="text-sm font-bold text-gray-200">{p.descripcion}</p><p className="text-[10px] font-bold text-cairo-orange uppercase">{p.tipo} • {p.codigo}</p></div>
+                            <div className="px-3 py-1 bg-cairo-red/10 border border-cairo-red/20 rounded text-cairo-red font-bold">{p.stock} <span className="text-[8px]">Unid.</span></div>
                           </div>
                         ))}
-                         {data?.productosBajoStock.length === 0 && <p className="text-green-500 text-sm">¡Stock en orden!</p>}
+                         {statsData?.productosBajoStock.length === 0 && <p className="text-green-500 text-sm">¡Stock en orden!</p>}
                       </div>
                     </div>
                   </div>
@@ -195,17 +142,15 @@ const Dashboard = () => {
             </motion.div>
           )}
 
-          {activeTab === 'productos' && (
-            <PlaceholderView title="Gestión de Productos" desc="Aquí podrás Crear, Editar y Eliminar Bicicletas y Repuestos." icon={<Package size={48}/>} />
-          )}
-          
-          {activeTab === 'ordenes' && (
-            <PlaceholderView title="Ordenes de Venta" desc="Administra los pedidos, cambia estados y emite facturas." icon={<ShoppingCart size={48}/>} />
-          )}
+          {/* 2. VISTA DE PRODUCTOS (REAL) */}
+          {activeTab === 'productos' && <ProductsView />}
 
-          {activeTab === 'usuarios' && (
-            <PlaceholderView title="Gestión de Usuarios" desc="Administra clientes, empleados y permisos." icon={<Users size={48}/>} />
-          )}
+          {/* 3. VISTA DE CONFIGURACIÓN */}
+          {activeTab === 'config' && <ConfigView />}
+
+          {/* PLACEHOLDERS */}
+          {activeTab === 'ordenes' && <PlaceholderView title="Ordenes de Venta" desc="Administra los pedidos, cambia estados y emite facturas." icon={<ShoppingCart size={48}/>} />}
+          {activeTab === 'usuarios' && <PlaceholderView title="Gestión de Usuarios" desc="Administra clientes, empleados y permisos." icon={<Users size={48}/>} />}
 
         </div>
       </main>
@@ -213,48 +158,434 @@ const Dashboard = () => {
   );
 };
 
-// --- Componentes Auxiliares ---
+// --- COMPONENTE: VISTA DE PRODUCTOS CONECTADA A LA BD ---
+const ProductsView = () => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filters, setFilters] = useState({ categoria: '', talle: '' });
+  const [sortOrder, setSortOrder] = useState('az'); 
+  const [selectedIds, setSelectedIds] = useState([]);
+
+  // Cargar productos al iniciar
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        // Llamada al endpoint real
+        const response = await axios.get(`${BASE_URL}/Productos`);
+        setProducts(response.data);
+      } catch (err) {
+        console.error("Error cargando productos:", err);
+        setError("Error al cargar el inventario.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadProducts();
+  }, []);
+
+  // Filtrado y Ordenamiento (En cliente para rapidez)
+  const filteredProducts = useMemo(() => {
+    let result = [...products];
+    
+    // Búsqueda (Usa 'descripcion' o 'nombre' según lo que venga de la API)
+    if (searchTerm) {
+      result = result.filter(p => 
+        (p.descripcion || p.nombre || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (p.codigo || "").toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    // Filtros
+    if (filters.categoria) result = result.filter(p => p.categoria === filters.categoria);
+    // Nota: El filtro de talle puede requerir ajuste según cómo guardes el talle en la BD (ej. en 'Descripcion' o columna aparte)
+    if (filters.talle) result = result.filter(p => (p.talle || "").includes(filters.talle));
+    
+    // Ordenar
+    result.sort((a, b) => {
+      const nameA = a.descripcion || a.nombre || "";
+      const nameB = b.descripcion || b.nombre || "";
+      const priceA = a.precioPublico || a.precio || 0;
+      const priceB = b.precioPublico || b.precio || 0;
+
+      switch (sortOrder) {
+        case 'az': return nameA.localeCompare(nameB);
+        case 'za': return nameB.localeCompare(nameA);
+        case 'price-asc': return priceA - priceB;
+        case 'price-desc': return priceB - priceA;
+        default: return 0;
+      }
+    });
+    return result;
+  }, [products, searchTerm, filters, sortOrder]);
+
+  const handleSelectOne = (id) => {
+    // Ajustar ID si viene como 'productoId' o 'id'
+    const prodId = id; 
+    if (selectedIds.includes(prodId)) setSelectedIds(selectedIds.filter(item => item !== prodId));
+    else setSelectedIds([...selectedIds, prodId]);
+  };
+
+  const handleSelectAll = () => {
+    if (selectedIds.length === filteredProducts.length) setSelectedIds([]);
+    else setSelectedIds(filteredProducts.map(p => p.bicicletaId || p.repuestoId || p.id));
+  };
+
+  const handleDeleteSelected = async () => {
+    if(!window.confirm(`¿Seguro que quieres eliminar ${selectedIds.length} productos?`)) return;
+
+    try {
+      // Ejemplo de eliminación masiva (ajustar endpoint según backend)
+      // await axios.post(`${BASE_URL}/Productos/EliminarMasivo`, { ids: selectedIds });
+      alert(`Simulación: Eliminando IDs ${selectedIds.join(", ")}`);
+      
+      // Actualizar estado local
+      setProducts(products.filter(p => !selectedIds.includes(p.bicicletaId || p.repuestoId || p.id)));
+      setSelectedIds([]);
+    } catch (err) {
+      alert("Error al eliminar productos");
+    }
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="relative min-h-[80vh]">
+      
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+          <h2 className="text-4xl font-brand text-white">Productos</h2>
+          <p className="text-gray-400 text-sm">Inventario general ({products.length} ítems)</p>
+        </div>
+        <button className="btn-fire flex items-center gap-2 text-sm px-6 py-2.5 shadow-lg shadow-cairo-orange/20">
+          <Plus size={18} /> Crear Nuevo
+        </button>
+      </div>
+
+      <div className="glass-panel p-4 rounded-2xl mb-6 flex flex-col lg:flex-row gap-4 items-center justify-between border border-white/10">
+        <div className="relative w-full lg:w-96 group">
+          <Search className="absolute left-3 top-3 text-gray-500 group-focus-within:text-cairo-orange transition-colors" size={20} />
+          <input
+            type="text"
+            placeholder="Buscar por nombre o código..."
+            className="w-full bg-black/40 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-cairo-orange focus:bg-black/60 transition-all"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+          <div className="flex items-center gap-2 bg-black/40 border border-white/10 px-3 py-2.5 rounded-xl hover:border-white/20 transition-colors">
+            <Filter size={16} className="text-cairo-yellow" />
+            <select
+              className="bg-transparent text-white text-sm focus:outline-none cursor-pointer w-32"
+              value={filters.categoria}
+              onChange={(e) => setFilters({ ...filters, categoria: e.target.value })}
+            >
+              <option value="" className="bg-cairo-dark">Categoría</option>
+              <option value="Bicicletas" className="bg-cairo-dark">Bicicletas</option>
+              <option value="Repuestos" className="bg-cairo-dark">Repuestos</option>
+              <option value="Accesorios" className="bg-cairo-dark">Accesorios</option>
+            </select>
+          </div>
+
+          <div className="flex items-center gap-2 bg-black/40 border border-white/10 px-3 py-2.5 rounded-xl hover:border-white/20 transition-colors">
+            <ArrowUpDown size={16} className="text-cairo-orange" />
+            <select
+              className="bg-transparent text-white text-sm focus:outline-none cursor-pointer w-32"
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+            >
+              <option value="az" className="bg-cairo-dark">A-Z</option>
+              <option value="za" className="bg-cairo-dark">Z-A</option>
+              <option value="price-asc" className="bg-cairo-dark">$ Menor</option>
+              <option value="price-desc" className="bg-cairo-dark">$ Mayor</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div className="glass-panel rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+        {loading ? (
+           <div className="p-12 text-center text-white flex flex-col items-center">
+              <Loader className="animate-spin mb-2" size={32}/>
+              <p>Cargando inventario...</p>
+           </div>
+        ) : error ? (
+           <div className="p-12 text-center text-cairo-red">{error}</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-white/5 border-b border-white/10 text-xs uppercase tracking-widest text-gray-400 font-bold">
+                  <th className="p-4 w-12 text-center">
+                    <button onClick={handleSelectAll} className="text-gray-400 hover:text-white transition-colors">
+                      {selectedIds.length > 0 && selectedIds.length === filteredProducts.length 
+                        ? <CheckSquare size={20} className="text-cairo-orange"/> 
+                        : <Square size={20}/>
+                      }
+                    </button>
+                  </th>
+                  <th className="p-4 w-20">Imagen</th>
+                  <th className="p-4">Producto</th>
+                  <th className="p-4">Info</th>
+                  <th className="p-4">Precio</th>
+                  <th className="p-4 text-center">Stock</th>
+                  <th className="p-4 text-right">Editar</th>
+                </tr>
+              </thead>
+
+              <tbody className="divide-y divide-white/5 text-sm">
+                {filteredProducts.map(product => {
+                  // Detectar ID único (puede ser bicicletaId o repuestoId)
+                  const pId = product.bicicletaId || product.repuestoId || product.id;
+                  const isSelected = selectedIds.includes(pId);
+                  
+                  // Propiedades adaptables (Back vs Front)
+                  const pNombre = product.descripcion || product.nombre || "Sin Nombre";
+                  const pPrecio = product.precioPublico || product.precio || 0;
+                  const pStock = product.stock !== undefined ? product.stock : 0;
+                  const pCategoria = product.categoria || "General";
+                  const pTalle = product.talle || product.rodado || "-";
+
+                  return (
+                    <tr 
+                      key={pId} 
+                      className={`transition-colors group ${isSelected ? 'bg-cairo-orange/10' : 'hover:bg-white/5'}`}
+                    >
+                      <td className="p-4 text-center">
+                        <button onClick={() => handleSelectOne(pId)} className="text-gray-500 hover:text-white transition-colors">
+                          {isSelected 
+                            ? <CheckSquare size={20} className="text-cairo-orange"/> 
+                            : <Square size={20}/>
+                          }
+                        </button>
+                      </td>
+
+                      <td className="p-4">
+                        <div className="h-12 w-12 rounded-lg bg-gray-800 flex items-center justify-center overflow-hidden border border-white/10 group-hover:border-cairo-orange/30 transition-colors">
+                          {product.imagenUrl ? (
+                             <img src={product.imagenUrl} alt="" className="w-full h-full object-cover"/>
+                          ) : (
+                             <Package size={24} className="text-gray-600" />
+                          )}
+                        </div>
+                      </td>
+
+                      <td className="p-4 font-bold text-white">
+                        {pNombre}
+                      </td>
+
+                      <td className="p-4">
+                        <div className="flex flex-col">
+                          <span className="text-xs text-gray-400">{pCategoria}</span>
+                          <span className="text-xs font-bold text-white bg-white/10 px-2 py-0.5 rounded w-fit mt-1">{pTalle}</span>
+                        </div>
+                      </td>
+
+                      <td className="p-4 font-brand text-xl text-white tracking-wide">
+                        ${pPrecio.toLocaleString()}
+                      </td>
+
+                      <td className="p-4 text-center">
+                        <span className={`px-2 py-1 rounded text-[10px] font-bold border uppercase
+                          ${pStock <= 2 
+                            ? 'bg-red-500/10 text-red-400 border-red-500/20' 
+                            : pStock < 10 
+                              ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' 
+                              : 'bg-green-500/10 text-green-400 border-green-500/20'
+                          }`}>
+                          {pStock}
+                        </span>
+                      </td>
+
+                      <td className="p-4 text-right">
+                        <div className="flex justify-end gap-2">
+                          <button className="p-2 rounded-lg hover:bg-cairo-orange/10 hover:text-cairo-orange text-gray-400 transition-colors" title="Editar">
+                            <Edit size={18} />
+                          </button>
+                        </div>
+                      </td>
+
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+        
+        {!loading && filteredProducts.length === 0 && (
+           <div className="text-center py-12 text-gray-500">
+              <Package size={48} className="mx-auto mb-3 opacity-50"/>
+              <p>No se encontraron productos.</p>
+           </div>
+        )}
+      </div>
+
+      <AnimatePresence>
+        {selectedIds.length > 0 && (
+          <motion.div 
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 glass-panel bg-cairo-dark/90 backdrop-blur-xl border border-cairo-red/30 px-6 py-3 rounded-full shadow-2xl flex items-center gap-6"
+          >
+            <div className="flex items-center gap-3">
+              <div className="bg-cairo-orange text-white text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full">
+                {selectedIds.length}
+              </div>
+              <span className="text-sm font-medium text-white">seleccionados</span>
+            </div>
+
+            <div className="h-6 w-px bg-white/10"></div>
+
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => setSelectedIds([])}
+                className="text-gray-400 hover:text-white text-xs font-bold uppercase transition-colors px-2"
+              >
+                Cancelar
+              </button>
+              <button 
+                onClick={handleDeleteSelected}
+                className="flex items-center gap-2 bg-cairo-red hover:bg-red-600 text-white text-xs font-bold uppercase px-4 py-2 rounded-full transition-colors shadow-lg shadow-cairo-red/20"
+              >
+                <Trash2 size={14} /> Eliminar
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+    </motion.div>
+  );
+};
+
+// --- COMPONENTE: VISTA DE CONFIGURACIÓN ---
+const ConfigView = () => {
+  const [loadingSave, setLoadingSave] = useState(false);
+
+  const handleSave = () => {
+    setLoadingSave(true);
+    setTimeout(() => {
+      setLoadingSave(false);
+      alert("Configuración guardada exitosamente");
+    }, 1500);
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+      
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h2 className="text-4xl font-brand text-white">Configuración</h2>
+          <p className="text-gray-400 text-sm">Ajustes generales de la tienda y el sistema.</p>
+        </div>
+        <button 
+          onClick={handleSave}
+          className="btn-fire flex items-center gap-2 text-sm px-8 py-3 shadow-lg shadow-cairo-orange/20"
+          disabled={loadingSave}
+        >
+          {loadingSave ? <RefreshCw className="animate-spin" size={18}/> : <Save size={18}/>}
+          {loadingSave ? 'Guardando...' : 'Guardar Cambios'}
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        {/* 1. Perfil */}
+        <div className="glass-panel p-6 rounded-2xl border border-white/10">
+          <h3 className="font-brand text-2xl text-white mb-6 flex items-center gap-2">
+            <Store size={22} className="text-cairo-yellow"/> Perfil de Tienda
+          </h3>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Nombre de la Tienda</label>
+              <input type="text" defaultValue="El Cairo Bicicletas" className="w-full bg-black/20 border border-white/10 rounded-xl p-3 text-white focus:border-cairo-orange outline-none transition-colors"/>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Email de Soporte</label>
+              <input type="email" defaultValue="contacto@elcairo.com" className="w-full bg-black/20 border border-white/10 rounded-xl p-3 text-white focus:border-cairo-orange outline-none transition-colors"/>
+            </div>
+          </div>
+        </div>
+
+        {/* 2. Reglas */}
+        <div className="glass-panel p-6 rounded-2xl border border-white/10">
+          <h3 className="font-brand text-2xl text-white mb-6 flex items-center gap-2">
+            <Truck size={22} className="text-cairo-orange"/> Logística
+          </h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Costo Envío</label>
+              <div className="relative">
+                <span className="absolute left-3 top-3 text-gray-500">$</span>
+                <input type="number" defaultValue="5000" className="w-full bg-black/20 border border-white/10 rounded-xl py-3 pl-8 pr-3 text-white focus:border-cairo-orange outline-none"/>
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Envío Gratis Desde</label>
+              <div className="relative">
+                <span className="absolute left-3 top-3 text-gray-500">$</span>
+                <input type="number" defaultValue="100000" className="w-full bg-black/20 border border-white/10 rounded-xl py-3 pl-8 pr-3 text-white focus:border-cairo-orange outline-none"/>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 3. Notificaciones */}
+        <div className="glass-panel p-6 rounded-2xl border border-white/10">
+          <h3 className="font-brand text-2xl text-white mb-6 flex items-center gap-2">
+            <Bell size={22} className="text-cairo-red"/> Notificaciones
+          </h3>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
+               <div className="flex items-center gap-3">
+                 <AlertTriangle size={18} className="text-gray-400"/>
+                 <span className="text-sm font-medium text-white">Alerta de Stock Bajo</span>
+               </div>
+               <div className="w-10 h-5 bg-cairo-dark border border-green-500 rounded-full relative cursor-pointer">
+                  <div className="absolute right-0.5 top-0.5 w-3.5 h-3.5 bg-green-500 rounded-full"></div>
+               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 4. Mantenimiento */}
+        <div className="glass-panel p-6 rounded-2xl border border-cairo-red/30">
+          <h3 className="font-brand text-2xl text-white mb-6 flex items-center gap-2">
+            <Shield size={22} className="text-red-500"/> Mantenimiento
+          </h3>
+          <button className="w-full py-3 bg-white/5 hover:bg-cairo-red/20 border border-white/10 hover:border-cairo-red/50 text-white rounded-xl transition-all text-sm font-bold flex items-center justify-center gap-2">
+             <RefreshCw size={16}/> Limpiar Caché del Sistema
+          </button>
+        </div>
+
+      </div>
+    </motion.div>
+  );
+};
+
+// --- AUXILIARES ---
 const SidebarItem = ({ icon, label, active, onClick }) => (
-  <button 
-    onClick={onClick}
-    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group
-      ${active 
-        ? 'bg-cairo-orange text-white shadow-lg shadow-cairo-orange/20 font-bold' 
-        : 'text-gray-400 hover:bg-white/5 hover:text-white'
-      }`}
-  >
-    <span className={`${active ? 'text-white' : 'text-gray-500 group-hover:text-cairo-yellow'} transition-colors`}>
-      {icon}
-    </span>
+  <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group ${active ? 'bg-cairo-orange text-white shadow-lg shadow-cairo-orange/20 font-bold' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}>
+    <span className={`${active ? 'text-white' : 'text-gray-500 group-hover:text-cairo-yellow'} transition-colors`}>{icon}</span>
     <span className="text-sm">{label}</span>
     {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white"></div>}
   </button>
 );
-
 const StatCard = ({ title, value, icon, color }) => (
   <div className="glass-panel p-6 rounded-2xl border border-white/10 flex items-center gap-4">
     <div className={`p-3 rounded-xl bg-white/5 ${color}`}>{icon}</div>
-    <div>
-      <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">{title}</p>
-      <p className="text-2xl font-brand text-white">{value}</p>
-    </div>
+    <div><p className="text-xs text-gray-400 font-bold uppercase tracking-wider">{title}</p><p className="text-2xl font-brand text-white">{value}</p></div>
   </div>
 );
-
 const PlaceholderView = ({ title, desc, icon }) => (
-  <motion.div 
-    initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
-    className="flex flex-col items-center justify-center h-[60vh] text-center border-2 border-dashed border-white/10 rounded-3xl bg-white/5"
-  >
-    <div className="p-6 bg-cairo-dark rounded-full mb-4 text-cairo-orange shadow-lg shadow-cairo-orange/10">
-      {icon}
-    </div>
+  <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center h-[60vh] text-center border-2 border-dashed border-white/10 rounded-3xl bg-white/5">
+    <div className="p-6 bg-cairo-dark rounded-full mb-4 text-cairo-orange shadow-lg shadow-cairo-orange/10">{icon}</div>
     <h2 className="text-4xl font-brand text-white mb-2">{title}</h2>
     <p className="text-gray-400 max-w-md">{desc}</p>
-    <button className="mt-6 px-6 py-2 bg-white/10 hover:bg-white/20 rounded-full text-sm font-bold transition-colors">
-      Próximamente
-    </button>
   </motion.div>
 );
 
