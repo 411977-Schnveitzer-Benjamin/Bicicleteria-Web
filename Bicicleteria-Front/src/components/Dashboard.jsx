@@ -1,16 +1,21 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { DollarSign, ShoppingBag, Users, AlertTriangle, Package, Activity } from 'lucide-react';
+import { 
+  LayoutDashboard, Package, ShoppingCart, Users, LogOut, ArrowLeft, 
+  Settings, DollarSign, Activity, AlertTriangle 
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext'; 
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 const Dashboard = () => {
+  const [activeTab, setActiveTab] = useState('estadisticas'); 
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { logout } = useAuth(); 
-
-  // CONFIGURADO PARA HTTPS 7222
   const API_URL = 'https://localhost:7222/api/Dashboard'; 
 
   useEffect(() => {
@@ -19,220 +24,237 @@ const Dashboard = () => {
         const response = await axios.get(API_URL);
         setData(response.data);
       } catch (err) {
-        console.error("Error Dashboard:", err);
-        if (err.response && err.response.status === 401) {
-            setError("Sesión expirada.");
-        } else if (err.code === "ERR_NETWORK" || err.code === "ERR_EMPTY_RESPONSE") {
-            // Mensaje específico para el error de certificado
-            setError("Error de Certificado SSL. Abre https://localhost:7222/api/Dashboard en otra pestaña y acepta el riesgo.");
-        } else {
-            setError("No se pudo conectar con el servidor.");
-        }
+        if (err.response?.status === 401) setError("Sesión expirada.");
+        else setError("No se pudo conectar con el servidor.");
       } finally {
         setLoading(false);
       }
     };
     fetchDashboard();
-  }, [logout]);
+  }, []);
 
-  if (loading) return (
-    <div className="flex justify-center items-center h-screen bg-cairo-dark">
-      <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-cairo-orange shadow-[0_0_20px_rgba(242,100,25,0.5)]"></div>
-    </div>
-  );
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
-  if (error) return (
-    <div className="p-10 flex justify-center items-center min-h-screen bg-cairo-dark">
-        <div className="glass-panel border border-red-500/30 text-red-200 px-8 py-6 rounded-2xl flex flex-col items-center shadow-[0_0_30px_rgba(220,38,38,0.2)] max-w-lg text-center">
-            <div className="flex items-center mb-4">
-                <AlertTriangle className="mr-4 text-cairo-red flex-shrink-0" size={32}/>
-                <span className="font-bold text-lg">Error de Conexión</span>
-            </div>
-            <p className="text-sm opacity-90">{error}</p>
-            {error.includes("SSL") && (
-                <a 
-                    href="https://localhost:7222/api/Dashboard" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="mt-4 px-6 py-2 bg-cairo-red text-white rounded-full text-sm font-bold hover:bg-red-600 transition-colors"
-                >
-                    Solucionar Permiso SSL
-                </a>
-            )}
-        </div>
-    </div>
-  );
+  // Obtenemos el nombre/email del token (sin hardcodear)
+  // Nota: En tu backend configuraste el email como 'unique_name'
+  const displayUser = user?.unique_name || user?.sub || "Usuario";
 
   return (
-    <div className="min-h-screen pt-28 pb-12 px-4 bg-cairo-dark relative overflow-hidden">
+    <div className="flex h-screen bg-cairo-dark overflow-hidden">
       
-      {/* Luces Ambientales */}
-      <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-cairo-red/10 rounded-full blur-[150px] -z-10" />
-      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-cairo-yellow/5 rounded-full blur-[150px] -z-10" />
-
-      <div className="max-w-7xl mx-auto">
+      {/* --- SIDEBAR (Menú Izquierdo) --- */}
+      <aside className="w-64 bg-black/40 border-r border-white/10 flex flex-col justify-between p-6 relative z-20 backdrop-blur-xl">
         
-        {/* TITULO */}
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-10 flex items-center gap-4 border-b border-white/10 pb-6"
-        >
-          <div className="p-3 bg-cairo-red rounded-lg shadow-[0_0_15px_rgba(217,37,37,0.4)]">
-             <Activity className="text-white" size={32} />
-          </div>
-          <div>
-            <h1 className="text-5xl font-brand text-white tracking-wide">PANEL DE CONTROL</h1>
-            <p className="text-gray-400 text-sm">Resumen de actividad en tiempo real</p>
-          </div>
-        </motion.div>
+        <div>
+          {/* Botón Volver */}
+          <Link to="/" className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-12 group">
+            <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform"/>
+            <span className="text-sm font-bold uppercase tracking-wider">Volver a la Tienda</span>
+          </Link>
+          
+          {/* ELIMINADO: El bloque de logo "EC" y título "ADMIN" que no querías */}
 
-        {/* 1. TARJETAS DE MÉTRICAS */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          <MetricCard 
-            icon={<DollarSign size={28} />} 
-            title="Ventas del Mes" 
-            value={data ? `$${data.totalVendidoMes.toLocaleString()}` : "$0"} 
-            color="text-green-400"
-            bgGlow="bg-green-500/10"
-            delay={0.1}
-          />
-          <MetricCard 
-            icon={<ShoppingBag size={28} />} 
-            title="Pedidos Realizados" 
-            value={data?.cantidadVentasMes || 0} 
-            color="text-cairo-yellow"
-            bgGlow="bg-cairo-yellow/10"
-            delay={0.2}
-          />
-          <MetricCard 
-            icon={<Users size={28} />} 
-            title="Nuevos Clientes" 
-            value={data?.clientesNuevosMes || 0} 
-            color="text-cairo-orange"
-            bgGlow="bg-cairo-orange/10"
-            delay={0.3}
-          />
+          {/* Menú de Navegación */}
+          <nav className="space-y-2">
+            <SidebarItem 
+              icon={<LayoutDashboard size={20}/>} 
+              label="Estadísticas" 
+              active={activeTab === 'estadisticas'} 
+              onClick={() => setActiveTab('estadisticas')}
+            />
+            <SidebarItem 
+              icon={<Package size={20}/>} 
+              label="Productos" 
+              active={activeTab === 'productos'} 
+              onClick={() => setActiveTab('productos')}
+            />
+            <SidebarItem 
+              icon={<ShoppingCart size={20}/>} 
+              label="Ordenes" 
+              active={activeTab === 'ordenes'} 
+              onClick={() => setActiveTab('ordenes')}
+            />
+            <SidebarItem 
+              icon={<Users size={20}/>} 
+              label="Usuarios" 
+              active={activeTab === 'usuarios'} 
+              onClick={() => setActiveTab('usuarios')}
+            />
+            <SidebarItem 
+              icon={<Settings size={20}/>} 
+              label="Configuración" 
+              active={activeTab === 'config'} 
+              onClick={() => setActiveTab('config')}
+            />
+          </nav>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* --- PERFIL DE USUARIO (Nuevo Diseño) --- */}
+        <div className="pt-6 border-t border-white/10 mt-auto">
+          <div className="flex items-center gap-3 p-2 rounded-xl bg-white/5 border border-white/5 hover:border-cairo-orange/30 transition-colors">
+             
+             {/* Inicial del Usuario */}
+             <div className="h-10 w-10 min-w-[2.5rem] rounded-full bg-cairo-orange/20 border border-cairo-orange/50 flex items-center justify-center text-cairo-orange font-bold shadow-sm">
+                {displayUser.charAt(0).toUpperCase()}
+             </div>
+             
+             {/* Datos Reales */}
+             <div className="flex-1 overflow-hidden">
+               <p className="text-xs font-bold text-white truncate" title={displayUser}>
+                 {displayUser}
+               </p>
+               <p className="text-[10px] text-cairo-orange font-bold uppercase tracking-wider truncate">
+                 Administrador
+               </p>
+             </div>
+
+             {/* Botón Salir (Icono) */}
+             <button 
+                onClick={handleLogout} 
+                className="p-2 text-gray-400 hover:text-cairo-red hover:bg-white/10 rounded-lg transition-all"
+                title="Cerrar Sesión"
+             >
+                <LogOut size={18}/>
+             </button>
+          </div>
+        </div>
+
+      </aside>
+
+      {/* --- AREA PRINCIPAL (Contenido) --- */}
+      <main className="flex-1 overflow-y-auto relative p-8">
+        {/* Fondo decorativo */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-cairo-red/5 rounded-full blur-[120px] -z-10" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-cairo-yellow/5 rounded-full blur-[120px] -z-10" />
+
+        <div className="max-w-6xl mx-auto">
           
-          {/* 2. TABLA ÚLTIMAS VENTAS */}
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 }}
-            className="glass-panel p-8 rounded-3xl border border-white/10 relative overflow-hidden group"
-          >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-cairo-yellow/5 rounded-full blur-[50px] group-hover:bg-cairo-yellow/10 transition-colors" />
-            
-            <h2 className="text-3xl font-brand mb-6 flex items-center text-white">
-              <Package className="mr-3 text-cairo-yellow" size={24}/> Últimas Ventas
-            </h2>
-            
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead className="text-gray-400 font-bold uppercase text-xs tracking-widest border-b border-white/10">
-                  <tr>
-                    <th className="p-4">Fecha</th>
-                    <th className="p-4">Cliente</th>
-                    <th className="p-4">Total</th>
-                    <th className="p-4 text-right">Estado</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/5">
-                  {data?.ultimasVentas && data.ultimasVentas.length > 0 ? (
-                    data.ultimasVentas.map((venta, i) => (
-                      <tr key={venta.id} className="hover:bg-white/5 transition-colors group/row">
-                        <td className="p-4 text-gray-400 text-sm">{venta.fecha}</td>
-                        <td className="p-4 text-white font-medium group-hover/row:text-cairo-yellow transition-colors">{venta.cliente}</td>
-                        <td className="p-4 text-white font-bold">${venta.total.toLocaleString()}</td>
-                        <td className="p-4 text-right">
-                          <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border
-                            ${venta.estado === 'Entregado' 
-                              ? 'bg-green-500/10 text-green-400 border-green-500/20' 
-                              : 'bg-cairo-orange/10 text-cairo-orange border-cairo-orange/20'}`}>
-                            {venta.estado}
-                          </span>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="4" className="p-8 text-center text-gray-500 italic">
-                        No hay movimientos recientes.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </motion.div>
+          {activeTab === 'estadisticas' && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+              <h2 className="text-4xl font-brand text-white mb-8 border-b border-white/10 pb-4">Resumen General</h2>
+              
+              {loading ? (
+                 <div className="text-white">Cargando datos...</div>
+              ) : error ? (
+                 <div className="text-cairo-red p-4 border border-cairo-red/20 rounded-lg bg-cairo-red/5">{error}</div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <StatCard title="Ventas Mensuales" value={`$${data?.totalVendidoMes.toLocaleString()}`} icon={<DollarSign/>} color="text-green-400" />
+                    <StatCard title="Pedidos" value={data?.cantidadVentasMes} icon={<ShoppingCart/>} color="text-cairo-yellow" />
+                    <StatCard title="Clientes Nuevos" value={data?.clientesNuevosMes} icon={<Users/>} color="text-cairo-orange" />
+                  </div>
 
-          {/* 3. ALERTAS DE STOCK */}
-          <motion.div 
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5 }}
-            className="glass-panel p-8 rounded-3xl border border-cairo-red/20 relative overflow-hidden shadow-[0_0_30px_rgba(217,37,37,0.05)]"
-          >
-             <div className="absolute -top-10 -right-10 w-40 h-40 bg-cairo-red/10 rounded-full blur-[60px]" />
-
-            <h2 className="text-3xl font-brand mb-6 flex items-center text-cairo-red drop-shadow-sm">
-              <AlertTriangle className="mr-3" size={24}/> Stock Crítico
-            </h2>
-
-            <div className="space-y-3">
-              {data?.productosBajoStock && data.productosBajoStock.length > 0 ? (
-                data.productosBajoStock.map((prod, i) => (
-                  <div key={i} className="flex justify-between items-center p-4 bg-black/20 rounded-xl border border-white/5 hover:border-cairo-red/40 transition-colors group">
-                    <div>
-                      <p className="font-bold text-white group-hover:text-cairo-red transition-colors">{prod.descripcion}</p>
-                      <p className="text-xs text-gray-500 font-bold uppercase tracking-wide">Cód: {prod.codigo} • {prod.tipo}</p>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div className="glass-panel p-6 rounded-2xl border border-white/10">
+                      <h3 className="font-brand text-2xl text-white mb-4 flex items-center gap-2">
+                        <Activity size={20} className="text-cairo-yellow"/> Últimas Ventas
+                      </h3>
+                      <div className="space-y-3">
+                        {data?.ultimasVentas.map(v => (
+                          <div key={v.id} className="flex justify-between items-center p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
+                            <div>
+                              <p className="text-sm font-bold text-white">{v.cliente}</p>
+                              <p className="text-xs text-gray-500">{v.fecha}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm font-bold text-green-400">${v.total.toLocaleString()}</p>
+                              <span className="text-[10px] uppercase text-gray-400">{v.estado}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                    <div className="text-center bg-cairo-red/10 px-4 py-2 rounded-lg border border-cairo-red/20 min-w-[70px]">
-                      <span className="text-2xl font-brand text-cairo-red block leading-none">{prod.stock}</span>
-                      <span className="text-[9px] text-red-300 uppercase font-bold">Unid.</span>
+
+                    <div className="glass-panel p-6 rounded-2xl border border-cairo-red/20 relative overflow-hidden">
+                      <div className="absolute top-0 right-0 w-20 h-20 bg-cairo-red/10 blur-xl rounded-full"></div>
+                      <h3 className="font-brand text-2xl text-cairo-red mb-4 flex items-center gap-2">
+                        <AlertTriangle size={20}/> Alertas de Stock
+                      </h3>
+                      <div className="space-y-3">
+                        {data?.productosBajoStock.map((p, i) => (
+                          <div key={i} className="flex justify-between items-center p-3 bg-black/20 border border-white/5 rounded-lg">
+                            <div>
+                              <p className="text-sm font-bold text-gray-200">{p.descripcion}</p>
+                              <p className="text-[10px] font-bold text-cairo-orange uppercase">{p.tipo} • {p.codigo}</p>
+                            </div>
+                            <div className="px-3 py-1 bg-cairo-red/10 border border-cairo-red/20 rounded text-cairo-red font-bold">
+                              {p.stock} <span className="text-[8px]">Unid.</span>
+                            </div>
+                          </div>
+                        ))}
+                         {data?.productosBajoStock.length === 0 && <p className="text-green-500 text-sm">¡Stock en orden!</p>}
+                      </div>
                     </div>
                   </div>
-                ))
-              ) : (
-                <div className="flex flex-col items-center justify-center h-48 text-green-500 bg-green-500/5 rounded-2xl border border-green-500/10">
-                    <Package size={40} className="mb-3 opacity-50"/>
-                    <p className="font-brand text-xl tracking-wide">¡Todo en Orden!</p>
-                    <p className="text-xs text-green-400/60">Stock saludable</p>
-                </div>
+                </>
               )}
-            </div>
-          </motion.div>
+            </motion.div>
+          )}
+
+          {activeTab === 'productos' && (
+            <PlaceholderView title="Gestión de Productos" desc="Aquí podrás Crear, Editar y Eliminar Bicicletas y Repuestos." icon={<Package size={48}/>} />
+          )}
+          
+          {activeTab === 'ordenes' && (
+            <PlaceholderView title="Ordenes de Venta" desc="Administra los pedidos, cambia estados y emite facturas." icon={<ShoppingCart size={48}/>} />
+          )}
+
+          {activeTab === 'usuarios' && (
+            <PlaceholderView title="Gestión de Usuarios" desc="Administra clientes, empleados y permisos." icon={<Users size={48}/>} />
+          )}
 
         </div>
-      </div>
+      </main>
     </div>
   );
 };
 
-// Componente Tarjeta de Métrica Reutilizable
-const MetricCard = ({ icon, title, value, color, bgGlow, delay }) => (
-  <motion.div 
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ delay: delay }}
-    className="glass-panel p-6 rounded-2xl border border-white/10 relative overflow-hidden group hover:border-white/20 transition-all"
+// --- Componentes Auxiliares ---
+
+const SidebarItem = ({ icon, label, active, onClick }) => (
+  <button 
+    onClick={onClick}
+    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group
+      ${active 
+        ? 'bg-cairo-orange text-white shadow-lg shadow-cairo-orange/20 font-bold' 
+        : 'text-gray-400 hover:bg-white/5 hover:text-white'
+      }`}
   >
-    <div className={`absolute -right-4 -top-4 w-24 h-24 ${bgGlow} rounded-full blur-[40px] group-hover:blur-[50px] transition-all`} />
-    
-    <div className="flex items-center mb-4 relative z-10">
-      <div className={`p-3 rounded-xl bg-white/5 ${color} border border-white/5 group-hover:scale-110 transition-transform`}>
-        {icon}
-      </div>
-      <p className="ml-4 text-gray-400 text-xs font-bold uppercase tracking-widest">{title}</p>
+    <span className={`${active ? 'text-white' : 'text-gray-500 group-hover:text-cairo-yellow'} transition-colors`}>
+      {icon}
+    </span>
+    <span className="text-sm">{label}</span>
+    {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white"></div>}
+  </button>
+);
+
+const StatCard = ({ title, value, icon, color }) => (
+  <div className="glass-panel p-6 rounded-2xl border border-white/10 flex items-center gap-4">
+    <div className={`p-3 rounded-xl bg-white/5 ${color}`}>{icon}</div>
+    <div>
+      <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">{title}</p>
+      <p className="text-2xl font-brand text-white">{value}</p>
     </div>
-    
-    <p className={`text-4xl font-brand text-white relative z-10 drop-shadow-lg`}>{value}</p>
-    
-    {/* Barra decorativa inferior */}
-    <div className={`absolute bottom-0 left-0 h-1 bg-current ${color} w-0 group-hover:w-full transition-all duration-700 opacity-50`} />
+  </div>
+);
+
+const PlaceholderView = ({ title, desc, icon }) => (
+  <motion.div 
+    initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+    className="flex flex-col items-center justify-center h-[60vh] text-center border-2 border-dashed border-white/10 rounded-3xl bg-white/5"
+  >
+    <div className="p-6 bg-cairo-dark rounded-full mb-4 text-cairo-orange shadow-lg shadow-cairo-orange/10">
+      {icon}
+    </div>
+    <h2 className="text-4xl font-brand text-white mb-2">{title}</h2>
+    <p className="text-gray-400 max-w-md">{desc}</p>
+    <button className="mt-6 px-6 py-2 bg-white/10 hover:bg-white/20 rounded-full text-sm font-bold transition-colors">
+      Próximamente
+    </button>
   </motion.div>
 );
 

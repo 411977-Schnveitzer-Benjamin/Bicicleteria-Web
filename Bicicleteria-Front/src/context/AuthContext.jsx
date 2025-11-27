@@ -1,10 +1,9 @@
 import { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode'; // Ojo: importación correcta de la librería
+import { jwtDecode } from 'jwt-decode';
 
 const AuthContext = createContext();
 
-// Hook personalizado para usar el contexto fácilmente
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
@@ -12,56 +11,70 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // URL Base (ajusta si usas https://localhost:7222)
-  const API_URL = 'https://localhost:7222/api/Auth'; 
+  // Asegúrate de que este puerto coincida con el de Dashboard.jsx
+  const API_URL = 'https://localhost:7222/api/Auth';
 
-  // Verificar si ya hay sesión al cargar la página
   useEffect(() => {
+    // 1. Configurar Interceptor: "Antes de enviar cualquier petición, haz esto..."
+    const interceptor = axios.interceptors.request.use(
+      (config) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+          console.log("Enviando Token:", token.substring(0, 10) + "..."); // Depuración
+        }
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
+
+    // 2. Verificar Sesión al cargar
     const token = localStorage.getItem('token');
     if (token) {
       try {
         const decoded = jwtDecode(token);
-        // Verificamos si el token no ha expirado
+        // Verificar expiración
         if (decoded.exp * 1000 > Date.now()) {
-          setUser(decoded); // Guardamos datos del usuario (rol, email, etc.)
+          setUser(decoded);
           setIsAuthenticated(true);
-          // Configuramos axios para que siempre envíe el token
-          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         } else {
+          console.warn("Token expirado");
           logout();
         }
       } catch (error) {
+        console.error("Token inválido", error);
         logout();
       }
     }
     setLoading(false);
+
+    // Limpieza del interceptor al desmontar
+    return () => axios.interceptors.request.eject(interceptor);
   }, []);
 
   const login = async (email, password) => {
     try {
-      // POST al endpoint de Login de tu backend
-      const response = await axios.post(`${API_URL}/Login`, { email, password });
+      const response = await axios.post(`${API_URL}/login`, { email, password });
       
-      // Asumiendo que tu back devuelve { token: "..." } o similar
-      // Ajusta esto según tu LoginDTO response. A veces es response.data directamente.
-      const token = response.data.token || response.data; 
+      // Manejar si el back devuelve { token: "..." } o el string directo
+      const token = response.data.token || response.data;
+      
+      if (!token) throw new Error("No se recibió token");
 
       localStorage.setItem('token', token);
       const decoded = jwtDecode(token);
       
       setUser(decoded);
       setIsAuthenticated(true);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      return true; // Login exitoso
+      return true;
     } catch (error) {
       console.error("Error en login:", error);
-      throw error; // Para mostrar error en el formulario
+      throw error;
     }
   };
 
   const register = async (userData) => {
     try {
-        // Asumiendo endpoint /Registro
       await axios.post(`${API_URL}/register`, userData);
       return true;
     } catch (error) {
@@ -72,7 +85,6 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('token');
-    delete axios.defaults.headers.common['Authorization'];
     setUser(null);
     setIsAuthenticated(false);
   };

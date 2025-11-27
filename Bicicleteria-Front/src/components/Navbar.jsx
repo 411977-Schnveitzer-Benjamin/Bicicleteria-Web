@@ -54,7 +54,7 @@ const Navbar = () => {
 
               {isAdmin && (
                 <Link to="/dashboard" className="text-cairo-red font-bold uppercase tracking-wider text-xs border border-cairo-red/30 px-3 py-1 rounded-full hover:bg-cairo-red hover:text-white transition-all">
-                  Dashboard
+                  Panel De Administrador
                 </Link>
               )}
             </div>
