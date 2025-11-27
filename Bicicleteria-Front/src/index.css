@@ -1,1 +1,37 @@
+/* 1. Importar las fuentes de Google */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;500;600;700&display=swap');
+
+/* 2. Importar Tailwind 4 */
 @import "tailwindcss";
+
+/* 3. Definir el TEMA personalizado (Esto reemplaza a tailwind.config.js) */
+@theme {
+  /* Paleta de Colores "El Cairo" */
+  --color-cairo-mustard: #D99C35;       /* Amarillo mostaza del logo */
+  --color-cairo-mustard-dark: #B37E26;  /* Para hovers */
+  --color-cairo-brown: #3A2B1A;         /* Marrón oscuro texto/fondo */
+  --color-cairo-cream: #F4EEDD;         /* Beige claro secundario */
+  --color-cairo-cream-light: #FFFDF5;   /* Fondo principal casi blanco */
+
+  /* Fuentes personalizadas */
+  --font-sans: "Montserrat", sans-serif;   /* Fuente por defecto */
+  --font-brand: "Bebas Neue", sans-serif;  /* Fuente para títulos */
+}
+
+/* 4. Aplicar fuentes base automáticamente */
+@layer base {
+  html {
+    font-family: var(--font-sans);
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-brand);
+    letter-spacing: 0.05em;
+  }
+}
+
+/* 5. Crear clases personalizadas (botones, etc.) */
+@layer components {
+  .btn-cairo {
+    @apply bg-cairo-mustard text-white font-bold py-2 px-4 rounded transition hover:bg-cairo-mustard-dark cursor-pointer;
+  }
+}
