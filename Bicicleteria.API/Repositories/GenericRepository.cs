@@ -1,6 +1,6 @@
-﻿using Bicicleteria.API.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
 using Bicicleteria.API.Models;
-using Microsoft.EntityFrameworkCore;
+using Bicicleteria.API.Interfaces;
 
 namespace Bicicleteria.API.Repositories
 {

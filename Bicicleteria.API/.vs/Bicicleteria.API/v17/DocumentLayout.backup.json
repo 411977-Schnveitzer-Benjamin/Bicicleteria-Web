@@ -3,6 +3,46 @@
   "WorkspaceRootPath": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|c:\\users\\bschn\\desktop\\web bicicleteria\\bicicleteria-web\\bicicleteria.api\\controllers\\carritocontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|solutionrelative:controllers\\carritocontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|c:\\users\\bschn\\desktop\\web bicicleteria\\bicicleteria-web\\bicicleteria.api\\dtos\\carritoitemdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|solutionrelative:dtos\\carritoitemdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|c:\\users\\bschn\\desktop\\web bicicleteria\\bicicleteria-web\\bicicleteria.api\\dtos\\agregarcarritodto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|solutionrelative:dtos\\agregarcarritodto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|c:\\users\\bschn\\desktop\\web bicicleteria\\bicicleteria-web\\bicicleteria.api\\repositories\\genericrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|solutionrelative:repositories\\genericrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|c:\\users\\bschn\\desktop\\web bicicleteria\\bicicleteria-web\\bicicleteria.api\\controllers\\bicicletascontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|solutionrelative:controllers\\bicicletascontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|c:\\users\\bschn\\desktop\\web bicicleteria\\bicicleteria-web\\bicicleteria.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|c:\\users\\bschn\\desktop\\web bicicleteria\\bicicleteria-web\\bicicleteria.api\\controllers\\metodospagocontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|solutionrelative:controllers\\metodospagocontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|c:\\users\\bschn\\desktop\\web bicicleteria\\bicicleteria-web\\bicicleteria.api\\controllers\\productoscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|solutionrelative:controllers\\productoscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|c:\\users\\bschn\\desktop\\web bicicleteria\\bicicleteria-web\\bicicleteria.api\\dtos\\metodopagodto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|solutionrelative:dtos\\metodopagodto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|c:\\users\\bschn\\desktop\\web bicicleteria\\bicicleteria-web\\bicicleteria.api\\dtos\\productoresumendto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|solutionrelative:dtos\\productoresumendto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|c:\\users\\bschn\\desktop\\web bicicleteria\\bicicleteria-web\\bicicleteria.api\\controllers\\indumentariacontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|solutionrelative:controllers\\indumentariacontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -15,20 +55,8 @@
       "RelativeMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|solutionrelative:controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|c:\\users\\bschn\\desktop\\web bicicleteria\\bicicleteria-web\\bicicleteria.api\\controllers\\bicicletascontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|solutionrelative:controllers\\bicicletascontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|c:\\users\\bschn\\desktop\\web bicicleteria\\bicicleteria-web\\bicicleteria.api\\dtos\\bicicletadto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|solutionrelative:dtos\\bicicletadto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|c:\\users\\bschn\\desktop\\web bicicleteria\\bicicleteria-web\\bicicleteria.api\\repositories\\genericrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|solutionrelative:repositories\\genericrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|c:\\users\\bschn\\desktop\\web bicicleteria\\bicicleteria-web\\bicicleteria.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|c:\\users\\bschn\\desktop\\web bicicleteria\\bicicleteria-web\\bicicleteria.api\\dtos\\googlelogindto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -74,7 +102,7 @@
       "DocumentGroups": [
         {
           "DockedHeight": 200,
-          "SelectedChildIndex": 7,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Bookmark",
@@ -98,7 +126,59 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 0,
+              "Title": "CarritoController.cs",
+              "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Controllers\\CarritoController.cs",
+              "RelativeDocumentMoniker": "Controllers\\CarritoController.cs",
+              "ToolTip": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Controllers\\CarritoController.cs*",
+              "RelativeToolTip": "Controllers\\CarritoController.cs*",
+              "ViewState": "AgIAAG4AAAAAAAAAAAAwwEwAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-27T12:46:10.555Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "CarritoItemDTO.cs",
+              "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\DTOs\\CarritoItemDTO.cs",
+              "RelativeDocumentMoniker": "DTOs\\CarritoItemDTO.cs",
+              "ToolTip": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\DTOs\\CarritoItemDTO.cs*",
+              "RelativeToolTip": "DTOs\\CarritoItemDTO.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-27T12:45:37.994Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "AgregarCarritoDTO.cs",
+              "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\DTOs\\AgregarCarritoDTO.cs",
+              "RelativeDocumentMoniker": "DTOs\\AgregarCarritoDTO.cs",
+              "ToolTip": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\DTOs\\AgregarCarritoDTO.cs*",
+              "RelativeToolTip": "DTOs\\AgregarCarritoDTO.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-27T12:45:14.827Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "MetodosPagoController.cs",
+              "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Controllers\\MetodosPagoController.cs",
+              "RelativeDocumentMoniker": "Controllers\\MetodosPagoController.cs",
+              "ToolTip": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Controllers\\MetodosPagoController.cs",
+              "RelativeToolTip": "Controllers\\MetodosPagoController.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAkwCEAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-27T12:37:04.567Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
               "Title": "BicicletaDTO.cs",
               "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\DTOs\\BicicletaDTO.cs",
               "RelativeDocumentMoniker": "DTOs\\BicicletaDTO.cs",
@@ -111,38 +191,103 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 5,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAC8AAAAAAAAAAAAkwFMAAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-26T23:31:10.524Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "BicicletasController.cs",
               "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Controllers\\BicicletasController.cs",
               "RelativeDocumentMoniker": "Controllers\\BicicletasController.cs",
               "ToolTip": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Controllers\\BicicletasController.cs",
               "RelativeToolTip": "Controllers\\BicicletasController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAmAAAAAAAAAA==",
+              "ViewState": "AgIAAB4AAAAAAAAAAAAkwEIAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-27T12:12:45.716Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
+              "Title": "GenericRepository.cs",
+              "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Repositories\\GenericRepository.cs",
+              "RelativeDocumentMoniker": "Repositories\\GenericRepository.cs",
+              "ToolTip": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Repositories\\GenericRepository.cs",
+              "RelativeToolTip": "Repositories\\GenericRepository.cs",
+              "ViewState": "AgIAAB0AAAAAAAAAAAAIwAYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-27T12:09:23.445Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "ProductoResumenDTO.cs",
+              "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\DTOs\\ProductoResumenDTO.cs",
+              "RelativeDocumentMoniker": "DTOs\\ProductoResumenDTO.cs",
+              "ToolTip": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\DTOs\\ProductoResumenDTO.cs",
+              "RelativeToolTip": "DTOs\\ProductoResumenDTO.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAA4AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-27T12:34:56.286Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "MetodoPagoDTO.cs",
+              "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\DTOs\\MetodoPagoDTO.cs",
+              "RelativeDocumentMoniker": "DTOs\\MetodoPagoDTO.cs",
+              "ToolTip": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\DTOs\\MetodoPagoDTO.cs",
+              "RelativeToolTip": "DTOs\\MetodoPagoDTO.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-27T12:35:36.871Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "ProductosController.cs",
+              "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Controllers\\ProductosController.cs",
+              "RelativeDocumentMoniker": "Controllers\\ProductosController.cs",
+              "ToolTip": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Controllers\\ProductosController.cs",
+              "RelativeToolTip": "Controllers\\ProductosController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAE8AAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-27T12:36:03.954Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
               "Title": "IndumentariaController.cs",
               "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Controllers\\IndumentariaController.cs",
               "RelativeDocumentMoniker": "Controllers\\IndumentariaController.cs",
-              "ToolTip": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Controllers\\IndumentariaController.cs*",
-              "RelativeToolTip": "Controllers\\IndumentariaController.cs*",
-              "ViewState": "AgIAABYAAAAAAAAAAAAkwDsAAAABAAAAAAAAAA==",
+              "ToolTip": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Controllers\\IndumentariaController.cs",
+              "RelativeToolTip": "Controllers\\IndumentariaController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADsAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-27T12:13:46.866Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 11,
               "Title": "RepuestosController.cs",
               "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Controllers\\RepuestosController.cs",
               "RelativeDocumentMoniker": "Controllers\\RepuestosController.cs",
-              "ToolTip": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Controllers\\RepuestosController.cs*",
-              "RelativeToolTip": "Controllers\\RepuestosController.cs*",
+              "ToolTip": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Controllers\\RepuestosController.cs",
+              "RelativeToolTip": "Controllers\\RepuestosController.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABsAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-27T12:13:23.813Z",
@@ -150,12 +295,12 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 12,
               "Title": "AuthController.cs",
               "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Controllers\\AuthController.cs",
               "RelativeDocumentMoniker": "Controllers\\AuthController.cs",
-              "ToolTip": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Controllers\\AuthController.cs*",
-              "RelativeToolTip": "Controllers\\AuthController.cs*",
+              "ToolTip": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Controllers\\AuthController.cs",
+              "RelativeToolTip": "Controllers\\AuthController.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAACEAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-26T23:30:53.101Z",
@@ -163,33 +308,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "GenericRepository.cs",
-              "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Repositories\\GenericRepository.cs",
-              "RelativeDocumentMoniker": "Repositories\\GenericRepository.cs",
-              "ToolTip": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Repositories\\GenericRepository.cs",
-              "RelativeToolTip": "Repositories\\GenericRepository.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAFAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-27T12:09:23.445Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Program.cs",
-              "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Program.cs",
-              "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAACYAAAAAAAAAAAAQwDoAAABYAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-26T23:31:10.524Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 14,
               "Title": "GoogleLoginDTO.cs",
               "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\DTOs\\GoogleLoginDTO.cs",
               "RelativeDocumentMoniker": "DTOs\\GoogleLoginDTO.cs",
@@ -202,7 +321,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 15,
               "Title": "IndumentariaDTO.cs",
               "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\DTOs\\IndumentariaDTO.cs",
               "RelativeDocumentMoniker": "DTOs\\IndumentariaDTO.cs",
@@ -215,7 +334,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 16,
               "Title": "RepuestoDTO.cs",
               "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\DTOs\\RepuestoDTO.cs",
               "RelativeDocumentMoniker": "DTOs\\RepuestoDTO.cs",
@@ -228,7 +347,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 17,
               "Title": "IGenericRepository.cs",
               "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Repositories\\Interfaces\\IGenericRepository.cs",
               "RelativeDocumentMoniker": "Repositories\\Interfaces\\IGenericRepository.cs",
@@ -241,7 +360,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 19,
               "Title": "LoginDTO.cs",
               "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\DTOs\\LoginDTO.cs",
               "RelativeDocumentMoniker": "DTOs\\LoginDTO.cs",
@@ -253,7 +372,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 18,
               "Title": "RegistroDTO.cs",
               "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\DTOs\\RegistroDTO.cs",
               "RelativeDocumentMoniker": "DTOs\\RegistroDTO.cs",
@@ -266,7 +385,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 20,
               "Title": "Bicicleteria.API.csproj",
               "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Bicicleteria.API.csproj",
               "RelativeDocumentMoniker": "Bicicleteria.API.csproj",
@@ -278,7 +397,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 21,
               "Title": "appsettings.json",
               "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\appsettings.json",
               "RelativeDocumentMoniker": "appsettings.json",
@@ -290,7 +409,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 22,
               "Title": "BicicleteriaWebContext.cs",
               "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Models\\BicicleteriaWebContext.cs",
               "RelativeDocumentMoniker": "Models\\BicicleteriaWebContext.cs",
