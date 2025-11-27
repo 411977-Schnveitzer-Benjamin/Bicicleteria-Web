@@ -24,7 +24,8 @@ namespace Bicicleteria.API.Controllers
                 .Select(m => new MetodoPagoDTO
                 {
                     Id = m.MetodoPagoId,
-                    Nombre = m.Nombre
+                    Nombre = m.Nombre,
+                    Instrucciones = m.Instrucciones
                 })
                 .ToListAsync();
 
