@@ -3,12 +3,16 @@
   "WorkspaceRootPath": "C:\\Users\\Ornella\\Documents\\Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|c:\\users\\ornella\\documents\\bicicleteria\\bicicleteria-web\\bicicleteria.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+      "AbsoluteMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|c:\\users\\ornella\\documents\\bicicleteria\\bicicleteria-web\\bicicleteria.api\\models\\bicicleteriawebcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|solutionrelative:models\\bicicleteriawebcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|c:\\users\\ornella\\documents\\bicicleteria\\bicicleteria-web\\bicicleteria.api\\controllers\\dashboardcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|solutionrelative:controllers\\dashboardcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|c:\\users\\ornella\\documents\\bicicleteria\\bicicleteria-web\\bicicleteria.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|c:\\users\\ornella\\documents\\bicicleteria\\bicicleteria-web\\bicicleteria.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -29,10 +33,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|c:\\users\\ornella\\documents\\bicicleteria\\bicicleteria-web\\bicicleteria.api\\dtos\\dashboarddto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|solutionrelative:dtos\\dashboarddto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|c:\\users\\ornella\\documents\\bicicleteria\\bicicleteria-web\\bicicleteria.api\\models\\bicicleteriawebcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|solutionrelative:models\\bicicleteriawebcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{C47C837D-4E8F-4BF5-8D81-8FD794F2F865}|Bicicleteria.API.csproj|c:\\users\\ornella\\documents\\bicicleteria\\bicicleteria-web\\bicicleteria.api\\models\\usuario.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -138,7 +138,7 @@
       "DocumentGroups": [
         {
           "DockedHeight": 200,
-          "SelectedChildIndex": 20,
+          "SelectedChildIndex": 8,
           "Children": [
             {
               "$type": "Document",
@@ -148,7 +148,7 @@
               "RelativeDocumentMoniker": "Controllers\\DashboardController.cs",
               "ToolTip": "C:\\Users\\Ornella\\Documents\\Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Controllers\\DashboardController.cs",
               "RelativeToolTip": "Controllers\\DashboardController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAA5AAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAmAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-27T14:03:46.251Z",
               "EditorCaption": ""
@@ -167,7 +167,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "IGenericRepository.cs",
               "DocumentMoniker": "C:\\Users\\Ornella\\Documents\\Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Repositories\\Interfaces\\IGenericRepository.cs",
               "RelativeDocumentMoniker": "Repositories\\Interfaces\\IGenericRepository.cs",
@@ -179,7 +179,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "GenericRepository.cs",
               "DocumentMoniker": "C:\\Users\\Ornella\\Documents\\Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Repositories\\GenericRepository.cs",
               "RelativeDocumentMoniker": "Repositories\\GenericRepository.cs",
@@ -191,7 +191,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "AuthController.cs",
               "DocumentMoniker": "C:\\Users\\Ornella\\Documents\\Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Controllers\\AuthController.cs",
               "RelativeDocumentMoniker": "Controllers\\AuthController.cs",
@@ -228,7 +228,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "DashboardDTO.cs",
               "DocumentMoniker": "C:\\Users\\Ornella\\Documents\\Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\DTOs\\DashboardDTO.cs",
               "RelativeDocumentMoniker": "DTOs\\DashboardDTO.cs",
@@ -240,15 +240,16 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 0,
               "Title": "BicicleteriaWebContext.cs",
               "DocumentMoniker": "C:\\Users\\Ornella\\Documents\\Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Models\\BicicleteriaWebContext.cs",
               "RelativeDocumentMoniker": "Models\\BicicleteriaWebContext.cs",
               "ToolTip": "C:\\Users\\Ornella\\Documents\\Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Models\\BicicleteriaWebContext.cs",
               "RelativeToolTip": "Models\\BicicleteriaWebContext.cs",
-              "ViewState": "AgIAAO0AAAAAAAAAAAAowAMBAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAABcAAAAAAAAAAIA5wB8AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-26T22:38:09.34Z"
+              "WhenOpened": "2025-11-26T22:38:09.34Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -360,7 +361,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\Ornella\\Documents\\Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
@@ -385,7 +386,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "appsettings.json",
               "DocumentMoniker": "C:\\Users\\Ornella\\Documents\\Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\appsettings.json",
               "RelativeDocumentMoniker": "appsettings.json",

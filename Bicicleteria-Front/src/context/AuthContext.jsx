@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
         // Asumiendo endpoint /Registro
-      await axios.post(`${API_URL}/Registro`, userData);
+      await axios.post(`${API_URL}/register`, userData);
       return true;
     } catch (error) {
       console.error("Error en registro:", error);
