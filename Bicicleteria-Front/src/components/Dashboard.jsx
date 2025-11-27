@@ -9,7 +9,7 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
 
   // URL de tu API (Ajusta el puerto si es necesario, ej: 7222 para https)
-  const API_URL = 'http://localhost:5028/api/Dashboard';
+  const API_URL = 'https://localhost:7222/api/Dashboard';
 
   useEffect(() => {
     const fetchDashboard = async () => {
