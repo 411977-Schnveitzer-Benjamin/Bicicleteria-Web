@@ -40,7 +40,6 @@ namespace Bicicleteria.API.Controllers
                 Email = request.Email,
                 PasswordHash = passwordHash,
                 RolId = rolIdDefecto,
-                Dni = request.Dni,  
                 Telefono = request.Telefono,
                 FechaRegistro = DateTime.Now,
                 Activo = true
@@ -79,7 +78,8 @@ namespace Bicicleteria.API.Controllers
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("Jwt:Key").Value!));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
 
             var token = new JwtSecurityToken(
                 claims: claims,

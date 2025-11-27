@@ -15,7 +15,7 @@ public partial class Usuario
 
     public string PasswordHash { get; set; } = null!;
 
-    public string? Dni { get; set; }
+    public DateTime? FechaNacimiento { get; set; }
 
     public string? Telefono { get; set; }
 
