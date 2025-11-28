@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useRef } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
 import { 
   LayoutDashboard, Package, ShoppingCart, Users, LogOut, ArrowLeft, 
@@ -12,6 +12,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 // --- URL BASE (HTTPS) ---
 const BASE_URL = 'https://localhost:7222/api';
+
+// --- CLOUDINARY CONFIG ---
+const CLOUD_NAME = 'dawjsvwjo';
+const UPLOAD_PRESET = 'bicicleteria_preset';
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('estadisticas'); 
@@ -274,6 +278,19 @@ const ProductsView = () => {
               <option value="Indumentaria" className="bg-cairo-dark">Indumentaria</option>
             </select>
           </div>
+          <div className="flex items-center gap-2 bg-black/40 border border-white/10 px-3 py-2.5 rounded-xl hover:border-white/20 transition-colors">
+            <ArrowUpDown size={16} className="text-cairo-orange" />
+            <select
+              className="bg-transparent text-white text-sm focus:outline-none cursor-pointer w-32"
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+            >
+              <option value="az" className="bg-cairo-dark">A-Z</option>
+              <option value="za" className="bg-cairo-dark">Z-A</option>
+              <option value="price-asc" className="bg-cairo-dark">$ Menor</option>
+              <option value="price-desc" className="bg-cairo-dark">$ Mayor</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -382,7 +399,6 @@ const ProductsView = () => {
         )}
       </AnimatePresence>
 
-      {/* --- MODAL DE CREACIÓN --- */}
       <CreateProductModal 
         isOpen={isCreateModalOpen} 
         onClose={() => setIsCreateModalOpen(false)}
@@ -425,7 +441,7 @@ const ConfigView = () => {
   );
 };
 
-// --- COMPONENTE: MODAL DE CREACIÓN AVANZADO ---
+// --- COMPONENTE: MODAL DE CREACIÓN (Con Cloudinary) ---
 const CreateProductModal = ({ isOpen, onClose, onSave }) => {
   const [type, setType] = useState('Bicicleta');
   const [loading, setLoading] = useState(false);
@@ -454,16 +470,51 @@ const CreateProductModal = ({ isOpen, onClose, onSave }) => {
     }
   };
 
-  const handleFileChange = (e) => {
+  // --- SUBIDA A CLOUDINARY (fetch sin Authorization) ---
+  const handleFileChange = async (e) => {
     const files = Array.from(e.target.files);
-    if (files.length > 0) {
-      const newImages = files.map(file => ({ file, preview: URL.createObjectURL(file) }));
-      setImages(prev => [...prev, ...newImages]);
+    if (files.length === 0) return;
+
+    const file = files[0];
+    const previewUrl = URL.createObjectURL(file);
+    setImages([{ file, preview: previewUrl }]);
+
+    // Preparar datos para Cloudinary
+    const formDataUpload = new FormData();
+    formDataUpload.append('file', file);
+    formDataUpload.append('upload_preset', UPLOAD_PRESET); 
+    formDataUpload.append('cloud_name', CLOUD_NAME);
+
+    try {
+      // Usamos FETCH para evitar el error de CORS y NO tocar tu backend local
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, 
+        {
+          method: 'POST',
+          body: formDataUpload
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error?.message || "Error de Cloudinary");
+      }
+
+      const urlReal = data.secure_url;
+      setFormData(prev => ({ ...prev, imagenURL: urlReal }));
+      console.log("Subida exitosa:", urlReal);
+
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Error al subir: " + error.message);
+      setImages([]); // Limpiar si falla
     }
   };
 
   const removeImage = (index) => {
     setImages(prev => prev.filter((_, i) => i !== index));
+    if (images.length === 1) setFormData(prev => ({ ...prev, imagenURL: '' }));
   };
 
   const handleSubmit = async (e) => {
@@ -482,7 +533,7 @@ const CreateProductModal = ({ isOpen, onClose, onSave }) => {
       precioPublico: Number(formData.precioPublico),
       precioCosto: Number(formData.precioPublico) * 0.7, 
       stock: Number(formData.stock),
-      imagenURL: formData.imagenURL || (images.length > 0 ? "imagen_local_placeholder.jpg" : ""),
+      imagenURL: formData.imagenURL || (images.length > 0 ? "https://placehold.co/400" : ""),
       moneda: 'ARS',
       activo: true
     };
