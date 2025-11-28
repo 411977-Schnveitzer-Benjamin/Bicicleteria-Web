@@ -276,4 +276,3 @@ WHERE Email = 'Admin@bicicleteria.com';
 
 DELETE FROM Roles
 WHERE NombreRol = 'Empleado';
-
