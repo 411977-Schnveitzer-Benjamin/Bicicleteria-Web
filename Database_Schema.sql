@@ -283,7 +283,6 @@ GO
 
 --TABLA MARCAS--
 
--- 1. Crear la tabla Marcas si no existe (parece que faltaba en tu esquema original)
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Marcas]') AND type in (N'U'))
 BEGIN
     CREATE TABLE Marcas (
@@ -295,7 +294,6 @@ BEGIN
 END
 GO
 
--- 2. Agregar la columna MarcaID a Bicicletas y conectarla
 IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'MarcaID' AND Object_ID = Object_ID(N'Bicicletas'))
 BEGIN
     ALTER TABLE Bicicletas ADD MarcaID INT NULL;
@@ -308,3 +306,5 @@ BEGIN
     PRINT 'Columna MarcaID agregada a Bicicletas y vinculada con Marcas.';
 END
 GO
+
+select * from Bicicletas
