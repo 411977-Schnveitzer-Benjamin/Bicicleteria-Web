@@ -276,3 +276,35 @@ WHERE Email = 'Admin@bicicleteria.com';
 
 DELETE FROM Roles
 WHERE NombreRol = 'Empleado';
+
+USE BicicleteriaWeb;
+GO
+
+
+--TABLA MARCAS--
+
+-- 1. Crear la tabla Marcas si no existe (parece que faltaba en tu esquema original)
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Marcas]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE Marcas (
+        MarcaID INT IDENTITY(1,1) PRIMARY KEY,
+        NombreMarca VARCHAR(50) UNIQUE NOT NULL,
+        LogoURL VARCHAR(500)
+    );
+    PRINT 'Tabla Marcas creada.';
+END
+GO
+
+-- 2. Agregar la columna MarcaID a Bicicletas y conectarla
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'MarcaID' AND Object_ID = Object_ID(N'Bicicletas'))
+BEGIN
+    ALTER TABLE Bicicletas ADD MarcaID INT NULL;
+    
+    -- Agregar la clave foránea (Relación)
+    ALTER TABLE Bicicletas 
+    ADD CONSTRAINT FK__Bicicleta__Marca__76969D2E 
+    FOREIGN KEY (MarcaID) REFERENCES Marcas(MarcaID);
+    
+    PRINT 'Columna MarcaID agregada a Bicicletas y vinculada con Marcas.';
+END
+GO
