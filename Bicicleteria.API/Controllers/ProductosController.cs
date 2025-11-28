@@ -139,5 +139,78 @@ namespace Bicicleteria.API.Controllers
 
             return Ok(listaAleatoria);
         }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<object>>> GetAll()
+        {
+            try
+            {
+                var listaUnificada = new List<object>();
+
+                // 1. Traer Bicicletas
+                // Usamos ToListAsync() aquí para ejecutar la consulta SQL inmediatamente
+                var bicis = await _context.Bicicletas
+                    .Where(b => b.Activo == true)
+                    .ToListAsync();
+
+                listaUnificada.AddRange(bicis.Select(b => new
+                {
+                    id = b.BicicletaId,
+                    bicicletaId = b.BicicletaId,
+                    codigo = b.Codigo,
+                    descripcion = b.Descripcion,
+                    precio = b.PrecioPublico,
+                    stock = b.Stock,       // <--- Si esto falla en SQL, aquí saltará el error
+                    imagenUrl = b.ImagenUrl,
+                    categoria = "Bicicletas",
+                    talle = b.Rodado
+                }));
+
+                // 2. Traer Repuestos
+                var repuestos = await _context.Repuestos
+                    .Where(r => r.Activo == true)
+                    .ToListAsync();
+
+                listaUnificada.AddRange(repuestos.Select(r => new
+                {
+                    id = r.RepuestoId,
+                    repuestoId = r.RepuestoId,
+                    codigo = r.Codigo,
+                    descripcion = r.Descripcion,
+                    precio = r.PrecioPublico,
+                    stock = r.Stock,
+                    imagenUrl = r.ImagenUrl,
+                    categoria = "Repuestos",
+                    talle = "-"
+                }));
+
+                // 3. Traer Indumentaria
+                // NOTA: Verifica que "_context.Indumentaria" sea el nombre correcto en tu BicicleteriaWebContext.
+                // A veces se llama "_context.Indumentariums".
+                var ropa = await _context.Indumentaria
+                    .Where(i => i.Activo == true)
+                    .ToListAsync();
+
+                listaUnificada.AddRange(ropa.Select(i => new
+                {
+                    id = i.IndumentariaId,
+                    indumentariaId = i.IndumentariaId,
+                    codigo = i.Codigo,
+                    descripcion = i.Descripcion,
+                    precio = i.PrecioPublico,
+                    stock = i.Stock,
+                    imagenUrl = i.ImagenUrl,
+                    categoria = "Indumentaria",
+                    talle = i.Talle
+                }));
+
+                return Ok(listaUnificada);
+            }
+            catch (Exception ex)
+            {
+                // Esto devolverá el error real al navegador (ej: "Invalid column name 'Stock'")
+                return BadRequest($"ERROR EN BACKEND: {ex.Message} - {ex.InnerException?.Message}");
+            }
+        }
     }
 }

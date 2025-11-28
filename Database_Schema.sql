@@ -270,11 +270,10 @@ INSERT INTO Roles (NombreRol) VALUES ('Administrador'), ('Empleado'), ('Cliente'
 
 --ACTUALIZACION DE ROLES--
 
-select * from Roles
-
 UPDATE Usuarios
 SET RolId = (SELECT RolId FROM Roles WHERE NombreRol = 'Administrador')
 WHERE Email = 'Admin@bicicleteria.com';
 
 DELETE FROM Roles
 WHERE NombreRol = 'Empleado';
+
