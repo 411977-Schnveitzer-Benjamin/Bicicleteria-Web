@@ -1,10 +1,10 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import axios from 'axios';
 import { 
   LayoutDashboard, Package, ShoppingCart, Users, LogOut, ArrowLeft, 
   Settings, DollarSign, Activity, AlertTriangle, Search, Filter, Plus, 
   ArrowUpDown, Edit, Trash2, X, CheckSquare, Square, Save, Store, 
-  Truck, Bell, Shield, RefreshCw, Info, MoreVertical, Loader
+  Truck, Bell, Shield, RefreshCw, Loader, Upload, Image as ImageIcon 
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext'; 
 import { Link, useNavigate } from 'react-router-dom';
@@ -122,7 +122,6 @@ const Dashboard = () => {
                     </div>
 
                     <div className="glass-panel p-6 rounded-2xl border border-cairo-red/20 relative overflow-hidden">
-                      <div className="absolute top-0 right-0 w-20 h-20 bg-cairo-red/10 blur-xl rounded-full"></div>
                       <h3 className="font-brand text-2xl text-cairo-red mb-4 flex items-center gap-2">
                         <AlertTriangle size={20}/> Alertas de Stock
                       </h3>
@@ -158,22 +157,21 @@ const Dashboard = () => {
   );
 };
 
-// --- COMPONENTE: VISTA DE PRODUCTOS CONECTADA A LA BD ---
+// --- COMPONENTE: VISTA DE PRODUCTOS ---
 const ProductsView = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({ categoria: '', talle: '' });
   const [sortOrder, setSortOrder] = useState('az'); 
   const [selectedIds, setSelectedIds] = useState([]);
 
-  // Cargar productos al iniciar
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        // Llamada al endpoint real
         const response = await axios.get(`${BASE_URL}/Productos`);
         setProducts(response.data);
       } catch (err) {
@@ -186,30 +184,22 @@ const ProductsView = () => {
     loadProducts();
   }, []);
 
-  // Filtrado y Ordenamiento (En cliente para rapidez)
   const filteredProducts = useMemo(() => {
     let result = [...products];
-    
-    // Búsqueda (Usa 'descripcion' o 'nombre' según lo que venga de la API)
     if (searchTerm) {
       result = result.filter(p => 
         (p.descripcion || p.nombre || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
         (p.codigo || "").toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    
-    // Filtros
     if (filters.categoria) result = result.filter(p => p.categoria === filters.categoria);
-    // Nota: El filtro de talle puede requerir ajuste según cómo guardes el talle en la BD (ej. en 'Descripcion' o columna aparte)
     if (filters.talle) result = result.filter(p => (p.talle || "").includes(filters.talle));
     
-    // Ordenar
     result.sort((a, b) => {
       const nameA = a.descripcion || a.nombre || "";
       const nameB = b.descripcion || b.nombre || "";
       const priceA = a.precioPublico || a.precio || 0;
       const priceB = b.precioPublico || b.precio || 0;
-
       switch (sortOrder) {
         case 'az': return nameA.localeCompare(nameB);
         case 'za': return nameB.localeCompare(nameA);
@@ -222,7 +212,6 @@ const ProductsView = () => {
   }, [products, searchTerm, filters, sortOrder]);
 
   const handleSelectOne = (id) => {
-    // Ajustar ID si viene como 'productoId' o 'id'
     const prodId = id; 
     if (selectedIds.includes(prodId)) setSelectedIds(selectedIds.filter(item => item !== prodId));
     else setSelectedIds([...selectedIds, prodId]);
@@ -235,13 +224,8 @@ const ProductsView = () => {
 
   const handleDeleteSelected = async () => {
     if(!window.confirm(`¿Seguro que quieres eliminar ${selectedIds.length} productos?`)) return;
-
     try {
-      // Ejemplo de eliminación masiva (ajustar endpoint según backend)
-      // await axios.post(`${BASE_URL}/Productos/EliminarMasivo`, { ids: selectedIds });
       alert(`Simulación: Eliminando IDs ${selectedIds.join(", ")}`);
-      
-      // Actualizar estado local
       setProducts(products.filter(p => !selectedIds.includes(p.bicicletaId || p.repuestoId || p.id)));
       setSelectedIds([]);
     } catch (err) {
@@ -257,7 +241,10 @@ const ProductsView = () => {
           <h2 className="text-4xl font-brand text-white">Productos</h2>
           <p className="text-gray-400 text-sm">Inventario general ({products.length} ítems)</p>
         </div>
-        <button className="btn-fire flex items-center gap-2 text-sm px-6 py-2.5 shadow-lg shadow-cairo-orange/20">
+        <button 
+          onClick={() => setIsCreateModalOpen(true)}
+          className="btn-fire flex items-center gap-2 text-sm px-6 py-2.5 shadow-lg shadow-cairo-orange/20"
+        >
           <Plus size={18} /> Crear Nuevo
         </button>
       </div>
@@ -273,7 +260,6 @@ const ProductsView = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-
         <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
           <div className="flex items-center gap-2 bg-black/40 border border-white/10 px-3 py-2.5 rounded-xl hover:border-white/20 transition-colors">
             <Filter size={16} className="text-cairo-yellow" />
@@ -285,21 +271,7 @@ const ProductsView = () => {
               <option value="" className="bg-cairo-dark">Categoría</option>
               <option value="Bicicletas" className="bg-cairo-dark">Bicicletas</option>
               <option value="Repuestos" className="bg-cairo-dark">Repuestos</option>
-              <option value="Accesorios" className="bg-cairo-dark">Accesorios</option>
-            </select>
-          </div>
-
-          <div className="flex items-center gap-2 bg-black/40 border border-white/10 px-3 py-2.5 rounded-xl hover:border-white/20 transition-colors">
-            <ArrowUpDown size={16} className="text-cairo-orange" />
-            <select
-              className="bg-transparent text-white text-sm focus:outline-none cursor-pointer w-32"
-              value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value)}
-            >
-              <option value="az" className="bg-cairo-dark">A-Z</option>
-              <option value="za" className="bg-cairo-dark">Z-A</option>
-              <option value="price-asc" className="bg-cairo-dark">$ Menor</option>
-              <option value="price-desc" className="bg-cairo-dark">$ Mayor</option>
+              <option value="Indumentaria" className="bg-cairo-dark">Indumentaria</option>
             </select>
           </div>
         </div>
@@ -315,7 +287,7 @@ const ProductsView = () => {
            <div className="p-12 text-center text-cairo-red">{error}</div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-center border-collapse">
               <thead>
                 <tr className="bg-white/5 border-b border-white/10 text-xs uppercase tracking-widest text-gray-400 font-bold">
                   <th className="p-4 w-12 text-center">
@@ -326,22 +298,20 @@ const ProductsView = () => {
                       }
                     </button>
                   </th>
-                  <th className="p-4 w-20">Imagen</th>
-                  <th className="p-4">Producto</th>
-                  <th className="p-4">Info</th>
-                  <th className="p-4">Precio</th>
+                  <th className="p-4 text-center">Imagen</th>
+                  <th className="p-4 text-center">Código</th>
+                  <th className="p-4 text-center">Producto</th>
+                  <th className="p-4 text-center">Info</th>
+                  <th className="p-4 text-center">Precio</th>
                   <th className="p-4 text-center">Stock</th>
-                  <th className="p-4 text-right">Editar</th>
+                  <th className="p-4 text-center">Editar</th>
                 </tr>
               </thead>
 
               <tbody className="divide-y divide-white/5 text-sm">
                 {filteredProducts.map(product => {
-                  // Detectar ID único (puede ser bicicletaId o repuestoId)
                   const pId = product.bicicletaId || product.repuestoId || product.id;
                   const isSelected = selectedIds.includes(pId);
-                  
-                  // Propiedades adaptables (Back vs Front)
                   const pNombre = product.descripcion || product.nombre || "Sin Nombre";
                   const pPrecio = product.precioPublico || product.precio || 0;
                   const pStock = product.stock !== undefined ? product.stock : 0;
@@ -349,64 +319,41 @@ const ProductsView = () => {
                   const pTalle = product.talle || product.rodado || "-";
 
                   return (
-                    <tr 
-                      key={pId} 
-                      className={`transition-colors group ${isSelected ? 'bg-cairo-orange/10' : 'hover:bg-white/5'}`}
-                    >
+                    <tr key={pId} className={`transition-colors group ${isSelected ? 'bg-cairo-orange/10' : 'hover:bg-white/5'}`}>
                       <td className="p-4 text-center">
-                        <button onClick={() => handleSelectOne(pId)} className="text-gray-500 hover:text-white transition-colors">
-                          {isSelected 
-                            ? <CheckSquare size={20} className="text-cairo-orange"/> 
-                            : <Square size={20}/>
-                          }
+                        <button onClick={() => handleSelectOne(pId)} className="text-gray-500 hover:text-white transition-colors flex justify-center w-full">
+                          {isSelected ? <CheckSquare size={20} className="text-cairo-orange"/> : <Square size={20}/>}
                         </button>
                       </td>
-
                       <td className="p-4">
-                        <div className="h-12 w-12 rounded-lg bg-gray-800 flex items-center justify-center overflow-hidden border border-white/10 group-hover:border-cairo-orange/30 transition-colors">
-                          {product.imagenUrl ? (
-                             <img src={product.imagenUrl} alt="" className="w-full h-full object-cover"/>
-                          ) : (
-                             <Package size={24} className="text-gray-600" />
-                          )}
+                        <div className="h-12 w-12 rounded-lg bg-gray-800 flex items-center justify-center overflow-hidden border border-white/10 group-hover:border-cairo-orange/30 transition-colors mx-auto">
+                          {product.imagenUrl ? <img src={product.imagenUrl} alt="" className="w-full h-full object-cover"/> : <Package size={24} className="text-gray-600" />}
                         </div>
                       </td>
-
-                      <td className="p-4 font-bold text-white">
-                        {pNombre}
-                      </td>
-
                       <td className="p-4">
-                        <div className="flex flex-col">
+                        <span className="font-mono text-xs text-cairo-orange bg-cairo-orange/10 px-2 py-1 rounded border border-cairo-orange/20 inline-block">
+                          {product.codigo}
+                        </span>
+                      </td>
+                      <td className="p-4 font-bold text-white">{pNombre}</td>
+                      <td className="p-4">
+                        <div className="flex flex-col items-center">
                           <span className="text-xs text-gray-400">{pCategoria}</span>
                           <span className="text-xs font-bold text-white bg-white/10 px-2 py-0.5 rounded w-fit mt-1">{pTalle}</span>
                         </div>
                       </td>
-
-                      <td className="p-4 font-brand text-xl text-white tracking-wide">
-                        ${pPrecio.toLocaleString()}
-                      </td>
-
+                      <td className="p-4 font-brand text-xl text-white tracking-wide">${pPrecio.toLocaleString()}</td>
                       <td className="p-4 text-center">
-                        <span className={`px-2 py-1 rounded text-[10px] font-bold border uppercase
-                          ${pStock <= 2 
-                            ? 'bg-red-500/10 text-red-400 border-red-500/20' 
-                            : pStock < 10 
-                              ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' 
-                              : 'bg-green-500/10 text-green-400 border-green-500/20'
-                          }`}>
+                        <span className={`px-2 py-1 rounded text-[10px] font-bold border uppercase inline-block
+                          ${pStock <= 2 ? 'bg-red-500/10 text-red-400 border-red-500/20' : pStock < 10 ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' : 'bg-green-500/10 text-green-400 border-green-500/20'}`}>
                           {pStock}
                         </span>
                       </td>
-
-                      <td className="p-4 text-right">
-                        <div className="flex justify-end gap-2">
-                          <button className="p-2 rounded-lg hover:bg-cairo-orange/10 hover:text-cairo-orange text-gray-400 transition-colors" title="Editar">
-                            <Edit size={18} />
-                          </button>
+                      <td className="p-4 text-center">
+                        <div className="flex justify-center gap-2">
+                          <button className="p-2 rounded-lg hover:bg-cairo-orange/10 hover:text-cairo-orange text-gray-400 transition-colors"><Edit size={18} /></button>
                         </div>
                       </td>
-
                     </tr>
                   );
                 })}
@@ -414,178 +361,257 @@ const ProductsView = () => {
             </table>
           </div>
         )}
-        
         {!loading && filteredProducts.length === 0 && (
-           <div className="text-center py-12 text-gray-500">
-              <Package size={48} className="mx-auto mb-3 opacity-50"/>
-              <p>No se encontraron productos.</p>
-           </div>
+           <div className="text-center py-12 text-gray-500"><Package size={48} className="mx-auto mb-3 opacity-50"/><p>No se encontraron productos.</p></div>
         )}
       </div>
 
       <AnimatePresence>
         {selectedIds.length > 0 && (
-          <motion.div 
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 glass-panel bg-cairo-dark/90 backdrop-blur-xl border border-cairo-red/30 px-6 py-3 rounded-full shadow-2xl flex items-center gap-6"
-          >
+          <motion.div initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }} className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 glass-panel bg-cairo-dark/90 backdrop-blur-xl border border-cairo-red/30 px-6 py-3 rounded-full shadow-2xl flex items-center gap-6">
             <div className="flex items-center gap-3">
-              <div className="bg-cairo-orange text-white text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full">
-                {selectedIds.length}
-              </div>
+              <div className="bg-cairo-orange text-white text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full">{selectedIds.length}</div>
               <span className="text-sm font-medium text-white">seleccionados</span>
             </div>
-
             <div className="h-6 w-px bg-white/10"></div>
-
             <div className="flex items-center gap-2">
-              <button 
-                onClick={() => setSelectedIds([])}
-                className="text-gray-400 hover:text-white text-xs font-bold uppercase transition-colors px-2"
-              >
-                Cancelar
-              </button>
-              <button 
-                onClick={handleDeleteSelected}
-                className="flex items-center gap-2 bg-cairo-red hover:bg-red-600 text-white text-xs font-bold uppercase px-4 py-2 rounded-full transition-colors shadow-lg shadow-cairo-red/20"
-              >
-                <Trash2 size={14} /> Eliminar
-              </button>
+              <button onClick={() => setSelectedIds([])} className="text-gray-400 hover:text-white text-xs font-bold uppercase transition-colors px-2">Cancelar</button>
+              <button onClick={handleDeleteSelected} className="flex items-center gap-2 bg-cairo-red hover:bg-red-600 text-white text-xs font-bold uppercase px-4 py-2 rounded-full transition-colors shadow-lg shadow-cairo-red/20"><Trash2 size={14} /> Eliminar</button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
+      {/* --- MODAL DE CREACIÓN --- */}
+      <CreateProductModal 
+        isOpen={isCreateModalOpen} 
+        onClose={() => setIsCreateModalOpen(false)}
+        onSave={() => window.location.reload()}
+      />
     </motion.div>
   );
 };
 
-// --- COMPONENTE: VISTA DE CONFIGURACIÓN ---
+// --- COMPONENTE: CONFIGURACIÓN ---
 const ConfigView = () => {
   const [loadingSave, setLoadingSave] = useState(false);
-
   const handleSave = () => {
     setLoadingSave(true);
-    setTimeout(() => {
-      setLoadingSave(false);
-      alert("Configuración guardada exitosamente");
-    }, 1500);
+    setTimeout(() => { setLoadingSave(false); alert("Configuración guardada exitosamente"); }, 1500);
+  };
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+      <div className="flex justify-between items-center mb-8">
+        <div><h2 className="text-4xl font-brand text-white">Configuración</h2><p className="text-gray-400 text-sm">Ajustes generales de la tienda y el sistema.</p></div>
+        <button onClick={handleSave} className="btn-fire flex items-center gap-2 text-sm px-8 py-3 shadow-lg shadow-cairo-orange/20" disabled={loadingSave}>
+          {loadingSave ? <RefreshCw className="animate-spin" size={18}/> : <Save size={18}/>} {loadingSave ? 'Guardando...' : 'Guardar Cambios'}
+        </button>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="glass-panel p-6 rounded-2xl border border-white/10">
+          <h3 className="font-brand text-2xl text-white mb-6 flex items-center gap-2"><Store size={22} className="text-cairo-yellow"/> Perfil de Tienda</h3>
+          <div className="space-y-4">
+            <div><label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Nombre de la Tienda</label><input type="text" defaultValue="El Cairo Bicicletas" className="w-full bg-black/20 border border-white/10 rounded-xl p-3 text-white focus:border-cairo-orange outline-none transition-colors"/></div>
+          </div>
+        </div>
+        <div className="glass-panel p-6 rounded-2xl border border-white/10">
+          <h3 className="font-brand text-2xl text-white mb-6 flex items-center gap-2"><Truck size={22} className="text-cairo-orange"/> Logística</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div><label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Costo Envío</label><input type="number" defaultValue="5000" className="w-full bg-black/20 border border-white/10 rounded-xl p-3 text-white focus:border-cairo-orange outline-none"/></div>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+// --- COMPONENTE: MODAL DE CREACIÓN AVANZADO ---
+const CreateProductModal = ({ isOpen, onClose, onSave }) => {
+  const [type, setType] = useState('Bicicleta');
+  const [loading, setLoading] = useState(false);
+  const [images, setImages] = useState([]); 
+  const [formData, setFormData] = useState({
+    codigo: '', descripcion: '', precioPublico: '', stock: '', imagenURL: '',
+    rodado: '', velocidades: '', marca: '', color: '', 
+    categoria: '', compatibilidad: '', 
+    talle: '', genero: '', tipoPrenda: '' 
+  });
+  const [touched, setTouched] = useState({});
+
+  if (!isOpen) return null;
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setTouched(prev => ({ ...prev, [name]: true }));
+    if (value && ['descripcion', 'marca', 'color', 'categoria', 'tipoPrenda', 'genero', 'compatibilidad'].includes(name)) {
+      const formatted = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+      setFormData(prev => ({ ...prev, [name]: formatted }));
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length > 0) {
+      const newImages = files.map(file => ({ file, preview: URL.createObjectURL(file) }));
+      setImages(prev => [...prev, ...newImages]);
+    }
+  };
+
+  const removeImage = (index) => {
+    setImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.codigo || !formData.descripcion || !formData.precioPublico || !formData.stock) {
+      alert("Por favor completa los campos obligatorios.");
+      setTouched({ codigo: true, descripcion: true, precioPublico: true, stock: true });
+      return;
+    }
+    setLoading(true);
+    
+    let endpoint = '';
+    let payload = {
+      codigo: formData.codigo,
+      descripcion: formData.descripcion,
+      precioPublico: Number(formData.precioPublico),
+      precioCosto: Number(formData.precioPublico) * 0.7, 
+      stock: Number(formData.stock),
+      imagenURL: formData.imagenURL || (images.length > 0 ? "imagen_local_placeholder.jpg" : ""),
+      moneda: 'ARS',
+      activo: true
+    };
+
+    if (type === 'Bicicleta') {
+      endpoint = '/Bicicletas';
+      payload = { ...payload, rodado: formData.rodado, velocidades: formData.velocidades, marca: formData.marca, color: formData.color, frenos: 'V-Brake' };
+    } else if (type === 'Repuesto') {
+      endpoint = '/Repuestos';
+      payload = { ...payload, categoria: formData.categoria, compatibilidad: formData.compatibilidad, marcaComponente: formData.marca };
+    } else {
+      endpoint = '/Indumentaria';
+      payload = { ...payload, talle: formData.talle, color: formData.color, genero: formData.genero, tipoPrenda: formData.tipoPrenda };
+    }
+
+    try {
+      const token = localStorage.getItem('token'); 
+      await axios.post(`${BASE_URL}${endpoint}`, payload, { headers: { Authorization: `Bearer ${token}` } });
+      onSave(); onClose(); alert("¡Producto creado exitosamente!");
+    } catch (error) {
+      console.error(error); alert("Error al crear: " + (error.response?.data?.title || error.message));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-      
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h2 className="text-4xl font-brand text-white">Configuración</h2>
-          <p className="text-gray-400 text-sm">Ajustes generales de la tienda y el sistema.</p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+      <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="glass-panel w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 p-0 shadow-2xl relative bg-[#0f0f0f]">
+        <div className="sticky top-0 z-10 bg-black/50 backdrop-blur-xl border-b border-white/10 p-6 flex justify-between items-center">
+          <h2 className="text-2xl font-brand text-white flex items-center gap-2"><Plus className="text-cairo-orange"/> Nuevo Producto</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-full"><X size={24}/></button>
         </div>
-        <button 
-          onClick={handleSave}
-          className="btn-fire flex items-center gap-2 text-sm px-8 py-3 shadow-lg shadow-cairo-orange/20"
-          disabled={loadingSave}
-        >
-          {loadingSave ? <RefreshCw className="animate-spin" size={18}/> : <Save size={18}/>}
-          {loadingSave ? 'Guardando...' : 'Guardar Cambios'}
-        </button>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        
-        {/* 1. Perfil */}
-        <div className="glass-panel p-6 rounded-2xl border border-white/10">
-          <h3 className="font-brand text-2xl text-white mb-6 flex items-center gap-2">
-            <Store size={22} className="text-cairo-yellow"/> Perfil de Tienda
-          </h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Nombre de la Tienda</label>
-              <input type="text" defaultValue="El Cairo Bicicletas" className="w-full bg-black/20 border border-white/10 rounded-xl p-3 text-white focus:border-cairo-orange outline-none transition-colors"/>
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Email de Soporte</label>
-              <input type="email" defaultValue="contacto@elcairo.com" className="w-full bg-black/20 border border-white/10 rounded-xl p-3 text-white focus:border-cairo-orange outline-none transition-colors"/>
-            </div>
+        <form onSubmit={handleSubmit} className="p-8 space-y-8">
+          <div className="flex p-1 bg-white/5 rounded-xl border border-white/10">
+            {['Bicicleta', 'Repuesto', 'Indumentaria'].map(t => (
+              <label key={t} className={`flex-1 cursor-pointer text-center py-2.5 rounded-lg transition-all font-bold text-sm ${type === t ? 'bg-cairo-orange text-white shadow-lg shadow-cairo-orange/20' : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'}`}>
+                <input type="radio" name="type" value={t} checked={type === t} onChange={() => setType(t)} className="hidden"/>{t}
+              </label>
+            ))}
           </div>
-        </div>
-
-        {/* 2. Reglas */}
-        <div className="glass-panel p-6 rounded-2xl border border-white/10">
-          <h3 className="font-brand text-2xl text-white mb-6 flex items-center gap-2">
-            <Truck size={22} className="text-cairo-orange"/> Logística
-          </h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Costo Envío</label>
-              <div className="relative">
-                <span className="absolute left-3 top-3 text-gray-500">$</span>
-                <input type="number" defaultValue="5000" className="w-full bg-black/20 border border-white/10 rounded-xl py-3 pl-8 pr-3 text-white focus:border-cairo-orange outline-none"/>
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+            <div className="md:col-span-4 space-y-4">
+              <label className="block text-xs font-bold text-gray-500 uppercase">Imágenes del Producto</label>
+              <div className="relative group">
+                <input type="file" multiple accept="image/*" onChange={handleFileChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"/>
+                <div className="border-2 border-dashed border-white/10 rounded-xl p-6 flex flex-col items-center justify-center text-center group-hover:border-cairo-orange/50 group-hover:bg-white/5 transition-all min-h-[160px]">
+                  <div className="bg-white/5 p-3 rounded-full mb-3 group-hover:scale-110 transition-transform"><Upload size={24} className="text-cairo-orange"/></div>
+                  <p className="text-sm text-gray-300 font-medium">Click o arrastra aquí</p>
+                </div>
               </div>
+              {images.length > 0 && (
+                <div className="grid grid-cols-3 gap-2">
+                  {images.map((img, idx) => (
+                    <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-white/10 group">
+                      <img src={img.preview} alt="preview" className="w-full h-full object-cover"/>
+                      <button type="button" onClick={() => removeImage(idx)} className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-cairo-red"><Trash2 size={16}/></button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div className="relative"><div className="absolute inset-y-0 left-3 flex items-center pointer-events-none"><ImageIcon size={14} className="text-gray-600"/></div><input name="imagenURL" placeholder="O pega una URL externa..." value={formData.imagenURL} onChange={handleChange} className="w-full bg-black/20 border border-white/10 rounded-lg py-2 pl-9 pr-3 text-xs text-white focus:border-cairo-orange focus:outline-none placeholder-gray-700"/></div>
             </div>
-            <div>
-              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Envío Gratis Desde</label>
-              <div className="relative">
-                <span className="absolute left-3 top-3 text-gray-500">$</span>
-                <input type="number" defaultValue="100000" className="w-full bg-black/20 border border-white/10 rounded-xl py-3 pl-8 pr-3 text-white focus:border-cairo-orange outline-none"/>
-              </div>
+            <div className="md:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input name="codigo" label="Código (SKU)" value={formData.codigo} onChange={handleChange} onBlur={handleBlur} required error={touched.codigo && !formData.codigo} />
+              <div className="md:col-span-2"><Input name="descripcion" label="Nombre / Descripción" value={formData.descripcion} onChange={handleChange} onBlur={handleBlur} required error={touched.descripcion && !formData.descripcion} /></div>
+              <Input name="precioPublico" label="Precio Venta ($)" type="number" value={formData.precioPublico} onChange={handleChange} required error={touched.precioPublico && !formData.precioPublico} />
+              <Input name="stock" label="Stock Inicial" type="number" value={formData.stock} onChange={handleChange} required error={touched.stock && !formData.stock} />
+              <div className="col-span-2 h-px bg-white/10 my-2"></div>
+              <AnimatePresence mode='wait'>
+                {type === 'Bicicleta' && (
+                  <motion.div key="bici" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="col-span-2 grid grid-cols-2 gap-4">
+                    <Input name="marca" label="Marca" value={formData.marca} onChange={handleChange} onBlur={handleBlur} />
+                    <Input name="rodado" label="Rodado (ej: 29)" value={formData.rodado} onChange={handleChange} />
+                    <Input name="color" label="Color" value={formData.color} onChange={handleChange} onBlur={handleBlur} />
+                    <Input name="velocidades" label="Velocidades" value={formData.velocidades} onChange={handleChange} />
+                  </motion.div>
+                )}
+                {type === 'Repuesto' && (
+                  <motion.div key="rep" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="col-span-2 grid grid-cols-2 gap-4">
+                    <Input name="categoria" label="Categoría" value={formData.categoria} onChange={handleChange} onBlur={handleBlur} />
+                    <Input name="compatibilidad" label="Compatibilidad" value={formData.compatibilidad} onChange={handleChange} onBlur={handleBlur} />
+                    <Input name="marca" label="Marca Componente" value={formData.marca} onChange={handleChange} onBlur={handleBlur} />
+                  </motion.div>
+                )}
+                {type === 'Indumentaria' && (
+                  <motion.div key="ind" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="col-span-2 grid grid-cols-2 gap-4">
+                    <Input name="tipoPrenda" label="Tipo de Prenda" value={formData.tipoPrenda} onChange={handleChange} onBlur={handleBlur} />
+                    <Input name="talle" label="Talle" value={formData.talle} onChange={handleChange} />
+                    <Input name="genero" label="Género" value={formData.genero} onChange={handleChange} onBlur={handleBlur} />
+                    <Input name="color" label="Color" value={formData.color} onChange={handleChange} onBlur={handleBlur} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
-        </div>
-
-        {/* 3. Notificaciones */}
-        <div className="glass-panel p-6 rounded-2xl border border-white/10">
-          <h3 className="font-brand text-2xl text-white mb-6 flex items-center gap-2">
-            <Bell size={22} className="text-cairo-red"/> Notificaciones
-          </h3>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
-               <div className="flex items-center gap-3">
-                 <AlertTriangle size={18} className="text-gray-400"/>
-                 <span className="text-sm font-medium text-white">Alerta de Stock Bajo</span>
-               </div>
-               <div className="w-10 h-5 bg-cairo-dark border border-green-500 rounded-full relative cursor-pointer">
-                  <div className="absolute right-0.5 top-0.5 w-3.5 h-3.5 bg-green-500 rounded-full"></div>
-               </div>
-            </div>
+          <div className="pt-6 flex justify-end gap-3 border-t border-white/10">
+            <button type="button" onClick={onClose} className="px-6 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-colors font-medium text-sm">Cancelar</button>
+            <button type="submit" disabled={loading} className="btn-fire px-8 py-2.5 text-sm shadow-lg shadow-cairo-orange/20 flex items-center gap-2">{loading ? <Loader className="animate-spin" size={18}/> : <Save size={18}/>} {loading ? 'Guardando...' : 'Guardar Producto'}</button>
           </div>
-        </div>
-
-        {/* 4. Mantenimiento */}
-        <div className="glass-panel p-6 rounded-2xl border border-cairo-red/30">
-          <h3 className="font-brand text-2xl text-white mb-6 flex items-center gap-2">
-            <Shield size={22} className="text-red-500"/> Mantenimiento
-          </h3>
-          <button className="w-full py-3 bg-white/5 hover:bg-cairo-red/20 border border-white/10 hover:border-cairo-red/50 text-white rounded-xl transition-all text-sm font-bold flex items-center justify-center gap-2">
-             <RefreshCw size={16}/> Limpiar Caché del Sistema
-          </button>
-        </div>
-
-      </div>
-    </motion.div>
+        </form>
+      </motion.div>
+    </div>
   );
 };
 
-// --- AUXILIARES ---
+// --- HELPER INPUT ---
+const Input = ({ label, error, type = "text", ...props }) => (
+  <div className="w-full">
+    <label className={`block text-xs font-bold uppercase mb-1.5 transition-colors ${error ? 'text-cairo-red' : 'text-gray-500'}`}>{label} {props.required && <span className="text-cairo-orange">*</span>}</label>
+    <input type={type} {...props} className={`w-full bg-black/40 border rounded-xl px-4 py-3 text-white text-sm transition-all focus:outline-none placeholder-gray-700 ${error ? 'border-cairo-red focus:border-cairo-red bg-cairo-red/5' : 'border-white/10 focus:border-cairo-orange focus:bg-black/60'} ${type === 'number' ? '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none' : ''}`} />
+    {error && <p className="text-[10px] text-cairo-red mt-1 font-medium">Requerido</p>}
+  </div>
+);
+
+// --- OTROS AUXILIARES ---
 const SidebarItem = ({ icon, label, active, onClick }) => (
   <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group ${active ? 'bg-cairo-orange text-white shadow-lg shadow-cairo-orange/20 font-bold' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}>
-    <span className={`${active ? 'text-white' : 'text-gray-500 group-hover:text-cairo-yellow'} transition-colors`}>{icon}</span>
-    <span className="text-sm">{label}</span>
-    {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white"></div>}
+    <span className={`${active ? 'text-white' : 'text-gray-500 group-hover:text-cairo-yellow'} transition-colors`}>{icon}</span><span className="text-sm">{label}</span>
   </button>
 );
 const StatCard = ({ title, value, icon, color }) => (
   <div className="glass-panel p-6 rounded-2xl border border-white/10 flex items-center gap-4">
-    <div className={`p-3 rounded-xl bg-white/5 ${color}`}>{icon}</div>
-    <div><p className="text-xs text-gray-400 font-bold uppercase tracking-wider">{title}</p><p className="text-2xl font-brand text-white">{value}</p></div>
+    <div className={`p-3 rounded-xl bg-white/5 ${color}`}>{icon}</div><div><p className="text-xs text-gray-400 font-bold uppercase tracking-wider">{title}</p><p className="text-2xl font-brand text-white">{value}</p></div>
   </div>
 );
 const PlaceholderView = ({ title, desc, icon }) => (
   <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center h-[60vh] text-center border-2 border-dashed border-white/10 rounded-3xl bg-white/5">
-    <div className="p-6 bg-cairo-dark rounded-full mb-4 text-cairo-orange shadow-lg shadow-cairo-orange/10">{icon}</div>
-    <h2 className="text-4xl font-brand text-white mb-2">{title}</h2>
-    <p className="text-gray-400 max-w-md">{desc}</p>
+    <div className="p-6 bg-cairo-dark rounded-full mb-4 text-cairo-orange shadow-lg shadow-cairo-orange/10">{icon}</div><h2 className="text-4xl font-brand text-white mb-2">{title}</h2><p className="text-gray-400 max-w-md">{desc}</p>
   </motion.div>
 );
 
