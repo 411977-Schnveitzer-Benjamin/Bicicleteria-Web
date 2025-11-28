@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization; // Para seguridad
-using Bicicleteria.API.Interfaces;
 using Bicicleteria.API.Models;
+using Bicicleteria.API.Interfaces; // O Repositories.Interfaces
 using Bicicleteria.API.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Bicicleteria.API.Controllers
 {
@@ -17,119 +17,114 @@ namespace Bicicleteria.API.Controllers
             _repository = repository;
         }
 
-        // GET: api/Bicicletas (Público)
+        // GET: api/Bicicletas
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<BicicletaDTO>>> GetAll()
+        public async Task<ActionResult<IEnumerable<BicicletaDTO>>> Get()
         {
             var bicis = await _repository.GetAllAsync();
-            var dtos = bicis.Where(b => b.Activo == true).Select(b => new BicicletaDTO
+
+            // Mapeo manual a DTO para devolver solo lo necesario
+            var dtos = bicis.Select(b => new BicicletaDTO
             {
-                Id = b.BicicletaId,
+                BicicletaId = b.BicicletaId,
                 Codigo = b.Codigo,
                 Descripcion = b.Descripcion,
-                PrecioPublico = b.PrecioPublico ?? 0,
-                ImagenURL = b.ImagenUrl,
+                PrecioPublico = b.PrecioPublico,
+                Stock = b.Stock ?? 0, 
+                ImagenUrl = b.ImagenUrl,
                 Rodado = b.Rodado,
                 Velocidades = b.Velocidades,
                 Marca = b.Marca,
-                Frenos = b.Frenos,
                 Color = b.Color
             });
+
             return Ok(dtos);
         }
 
-        // GET: api/Bicicletas/5 (Público)
+        // GET: api/Bicicletas/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<BicicletaDTO>> GetById(int id)
+        public async Task<ActionResult<BicicletaDTO>> Get(int id)
         {
             var b = await _repository.GetByIdAsync(id);
-            if (b == null || b.Activo != true) return NotFound();
+            if (b == null) return NotFound();
 
-            return Ok(new BicicletaDTO
+            var dto = new BicicletaDTO
             {
-                Id = b.BicicletaId,
+                BicicletaId = b.BicicletaId,
                 Codigo = b.Codigo,
                 Descripcion = b.Descripcion,
-                PrecioPublico = b.PrecioPublico ?? 0,
-                ImagenURL = b.ImagenUrl,
+                PrecioPublico = b.PrecioPublico,
+                Stock = b.Stock ?? 0,
+                ImagenUrl = b.ImagenUrl,
                 Rodado = b.Rodado,
                 Velocidades = b.Velocidades,
                 Marca = b.Marca,
-                Frenos = b.Frenos,
                 Color = b.Color
-            });
+            };
+
+            return Ok(dto);
         }
 
-        // --- ZONA ADMINISTRADOR ---
-
-        // POST: api/Bicicletas (Crear)
+        // POST: api/Bicicletas
         [HttpPost]
-        [Authorize(Roles = "Administrador")]
+        // [Authorize(Roles = "Administrador")] // Descomenta cuando tengas el Auth listo
         public async Task<ActionResult> Create(BicicletaAdminDTO dto)
         {
+            // 1. VERIFICACIÓN DE DUPLICADOS
+            bool existe = await _repository.ExistsAsync(x => x.Codigo == dto.Codigo);
+            if (existe)
+            {
+                return BadRequest(new { title = "Código Duplicado", message = $"El código '{dto.Codigo}' ya está en uso en otra bicicleta." });
+            }
+
+            // 2. Mapeo de DTO a Entidad
             var nuevaBici = new Bicicleta
             {
                 Codigo = dto.Codigo,
                 Descripcion = dto.Descripcion,
-                PrecioCosto = dto.PrecioCosto,
                 PrecioPublico = dto.PrecioPublico,
-                Stock = dto.Stock,
-                Moneda = dto.Moneda,
-                Activo = dto.Activo,
-                ImagenUrl = dto.ImagenURL,
+                PrecioCosto = dto.PrecioCosto,
+                Stock = dto.Stock ?? 0,
+                ImagenUrl = dto.ImagenUrl,
                 Rodado = dto.Rodado,
                 Velocidades = dto.Velocidades,
                 Marca = dto.Marca,
-                Frenos = dto.Frenos,
                 Color = dto.Color,
+                Frenos = dto.Frenos,
+                Activo = true,
                 FechaAlta = DateTime.Now
             };
 
             await _repository.AddAsync(nuevaBici);
-            return Ok(new { mensaje = "Bicicleta creada exitosamente", id = nuevaBici.BicicletaId });
+            return Ok(new { message = "Bicicleta creada exitosamente" });
         }
 
-        // PUT: api/Bicicletas/5 (Actualizar)
+        // PUT: api/Bicicletas/5
         [HttpPut("{id}")]
-        [Authorize(Roles = "Administrador")]
-        public async Task<IActionResult> Update(int id, BicicletaAdminDTO dto)
+        public async Task<ActionResult> Update(int id, BicicletaAdminDTO dto)
         {
-            var bici = await _repository.GetByIdAsync(id);
-            if (bici == null) return NotFound();
+            var biciExistente = await _repository.GetByIdAsync(id);
+            if (biciExistente == null) return NotFound("Bicicleta no encontrada");
 
             // Actualizamos los campos
-            bici.Codigo = dto.Codigo;
-            bici.Descripcion = dto.Descripcion;
-            bici.PrecioCosto = dto.PrecioCosto;
-            bici.PrecioPublico = dto.PrecioPublico;
-            bici.Stock = dto.Stock;
-            bici.Moneda = dto.Moneda;
-            bici.Activo = dto.Activo;
-            bici.ImagenUrl = dto.ImagenURL;
-            bici.Rodado = dto.Rodado;
-            bici.Velocidades = dto.Velocidades;
-            bici.Marca = dto.Marca;
-            bici.Frenos = dto.Frenos;
-            bici.Color = dto.Color;
+            biciExistente.Descripcion = dto.Descripcion;
+            biciExistente.PrecioPublico = dto.PrecioPublico;
+            biciExistente.PrecioCosto = dto.PrecioCosto;
+            biciExistente.Stock = dto.Stock ?? 0;
+            biciExistente.ImagenUrl = dto.ImagenUrl;
+            biciExistente.Rodado = dto.Rodado;
+            biciExistente.Velocidades = dto.Velocidades;
+            biciExistente.Marca = dto.Marca;
+            biciExistente.Color = dto.Color;
+            biciExistente.Frenos = dto.Frenos;
 
-            await _repository.UpdateAsync(bici);
-            return Ok(new { mensaje = "Bicicleta actualizada" });
-        }
+            // Nota: Generalmente no permitimos cambiar el Código al editar para no romper historial,
+            // pero si quisieras, deberías validar duplicados aquí también.
 
-        // DELETE: api/Bicicletas/5 (Borrar)
-        [HttpDelete("{id}")]
-        [Authorize(Roles = "Administrador")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            // Usamos borrado físico (Repository.Delete) o lógico (Activo = false)
-            // Aquí haremos borrado lógico para no romper ventas históricas
-            var bici = await _repository.GetByIdAsync(id);
-            if (bici == null) return NotFound();
-
-            bici.Activo = false; // "Borrado" lógico
-            await _repository.UpdateAsync(bici);
-
-            return Ok(new { mensaje = "Bicicleta eliminada (desactivada)" });
+            await _repository.UpdateAsync(biciExistente);
+            return Ok(new { message = "Bicicleta actualizada" });
         }
     }
 }
+
+// DELETE: api

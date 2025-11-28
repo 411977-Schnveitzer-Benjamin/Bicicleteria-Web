@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using Bicicleteria.API.Interfaces;
 using Bicicleteria.API.Models;
+using Bicicleteria.API.Interfaces;
 using Bicicleteria.API.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Bicicleteria.API.Controllers
 {
@@ -18,16 +18,17 @@ namespace Bicicleteria.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<RepuestoDTO>>> GetAll()
+        public async Task<ActionResult<IEnumerable<RepuestoDTO>>> Get()
         {
-            var items = await _repository.GetAllAsync();
-            var dtos = items.Where(r => r.Activo == true).Select(r => new RepuestoDTO
+            var lista = await _repository.GetAllAsync();
+            var dtos = lista.Select(r => new RepuestoDTO
             {
-                Id = r.RepuestoId,
+                RepuestoId = r.RepuestoId,
                 Codigo = r.Codigo,
                 Descripcion = r.Descripcion,
-                PrecioPublico = r.PrecioPublico ?? 0,
-                ImagenURL = r.ImagenUrl,
+                PrecioPublico = r.PrecioPublico,
+                Stock = r.Stock ?? 0,
+                ImagenUrl = r.ImagenUrl,
                 Categoria = r.Categoria,
                 Compatibilidad = r.Compatibilidad,
                 MarcaComponente = r.MarcaComponente
@@ -35,82 +36,62 @@ namespace Bicicleteria.API.Controllers
             return Ok(dtos);
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<RepuestoDTO>> GetById(int id)
-        {
-            var r = await _repository.GetByIdAsync(id);
-            if (r == null || r.Activo != true) return NotFound();
-
-            return Ok(new RepuestoDTO
-            {
-                Id = r.RepuestoId,
-                Codigo = r.Codigo,
-                Descripcion = r.Descripcion,
-                PrecioPublico = r.PrecioPublico ?? 0,
-                ImagenURL = r.ImagenUrl,
-                Categoria = r.Categoria,
-                Compatibilidad = r.Compatibilidad,
-                MarcaComponente = r.MarcaComponente
-            });
-        }
-
-        // --- ABM ADMIN ---
-
         [HttpPost]
-        [Authorize(Roles = "Administrador")]
         public async Task<ActionResult> Create(RepuestoAdminDTO dto)
         {
+            // 1. Validación
+            bool existe = await _repository.ExistsAsync(r => r.Codigo == dto.Codigo);
+            if (existe)
+                return BadRequest(new { title = "Código Duplicado", message = $"El código '{dto.Codigo}' ya existe en Repuestos." });
+
+            // 2. Mapeo
             var nuevo = new Repuesto
             {
                 Codigo = dto.Codigo,
                 Descripcion = dto.Descripcion,
-                PrecioCosto = dto.PrecioCosto,
                 PrecioPublico = dto.PrecioPublico,
-                Stock = dto.Stock,
-                Moneda = dto.Moneda,
-                Activo = dto.Activo,
-                ImagenUrl = dto.ImagenURL,
+                PrecioCosto = dto.PrecioCosto,
+                Stock = dto.Stock ?? 0,
+                ImagenUrl = dto.ImagenUrl,
                 Categoria = dto.Categoria,
                 Compatibilidad = dto.Compatibilidad,
                 MarcaComponente = dto.MarcaComponente,
+                Activo = true,
                 FechaAlta = DateTime.Now
             };
+
             await _repository.AddAsync(nuevo);
-            return Ok(new { mensaje = "Repuesto creado", id = nuevo.RepuestoId });
+            return Ok(new { message = "Repuesto creado" });
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Administrador")]
-        public async Task<IActionResult> Update(int id, RepuestoAdminDTO dto)
+        public async Task<ActionResult> Update(int id, RepuestoAdminDTO dto)
         {
-            var item = await _repository.GetByIdAsync(id);
-            if (item == null) return NotFound();
+            var entity = await _repository.GetByIdAsync(id);
+            if (entity == null) return NotFound();
 
-            item.Codigo = dto.Codigo;
-            item.Descripcion = dto.Descripcion;
-            item.PrecioCosto = dto.PrecioCosto;
-            item.PrecioPublico = dto.PrecioPublico;
-            item.Stock = dto.Stock;
-            item.Moneda = dto.Moneda;
-            item.Activo = dto.Activo;
-            item.ImagenUrl = dto.ImagenURL;
-            item.Categoria = dto.Categoria;
-            item.Compatibilidad = dto.Compatibilidad;
-            item.MarcaComponente = dto.MarcaComponente;
+            entity.Descripcion = dto.Descripcion;
+            entity.PrecioPublico = dto.PrecioPublico;
+            entity.PrecioCosto = dto.PrecioCosto;
+            entity.Stock = dto.Stock ?? 0;
+            entity.ImagenUrl = dto.ImagenUrl;
+            entity.Categoria = dto.Categoria;
+            entity.Compatibilidad = dto.Compatibilidad;
+            entity.MarcaComponente = dto.MarcaComponente;
 
-            await _repository.UpdateAsync(item);
-            return Ok(new { mensaje = "Repuesto actualizado" });
+            await _repository.UpdateAsync(entity);
+            return Ok(new { message = "Repuesto actualizado" });
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Administrador")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            var item = await _repository.GetByIdAsync(id);
-            if (item == null) return NotFound();
-            item.Activo = false;
-            await _repository.UpdateAsync(item);
-            return Ok(new { mensaje = "Repuesto eliminado" });
+            var entity = await _repository.GetByIdAsync(id);
+            if (entity == null) return NotFound();
+
+            entity.Activo = false;
+            await _repository.UpdateAsync(entity);
+            return Ok(new { message = "Repuesto eliminado" });
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Bicicleteria.API.Models;
 using Bicicleteria.API.Interfaces;
+using System.Linq.Expressions;
 
 namespace Bicicleteria.API.Repositories
 {
@@ -46,6 +47,10 @@ namespace Bicicleteria.API.Repositories
                 _dbSet.Remove(entity);
                 await _context.SaveChangesAsync();
             }
+        }
+        public async Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbSet.AnyAsync(predicate);
         }
     }
 }

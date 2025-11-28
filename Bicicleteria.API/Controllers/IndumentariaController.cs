@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using Bicicleteria.API.Interfaces;
 using Bicicleteria.API.Models;
+using Bicicleteria.API.Interfaces;
 using Bicicleteria.API.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Bicicleteria.API.Controllers
 {
@@ -18,103 +18,83 @@ namespace Bicicleteria.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<IndumentariaDTO>>> GetAll()
+        public async Task<ActionResult<IEnumerable<IndumentariaDTO>>> Get()
         {
-            var items = await _repository.GetAllAsync();
-            var dtos = items.Where(i => i.Activo == true).Select(i => new IndumentariaDTO
+            var lista = await _repository.GetAllAsync();
+            var dtos = lista.Select(i => new IndumentariaDTO
             {
-                Id = i.IndumentariaId,
+                IndumentariaId = i.IndumentariaId,
                 Codigo = i.Codigo,
                 Descripcion = i.Descripcion,
-                PrecioPublico = i.PrecioPublico ?? 0,
-                ImagenURL = i.ImagenUrl,
+                PrecioPublico = i.PrecioPublico,
+                Stock = i.Stock ?? 0,
+                ImagenUrl = i.ImagenUrl,
                 Talle = i.Talle,
-                Color = i.Color,
                 Genero = i.Genero,
-                TipoPrenda = i.TipoPrenda
+                TipoPrenda = i.TipoPrenda,
+                Color = i.Color
             });
             return Ok(dtos);
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<IndumentariaDTO>> GetById(int id)
-        {
-            var i = await _repository.GetByIdAsync(id);
-            if (i == null || i.Activo != true) return NotFound();
-
-            return Ok(new IndumentariaDTO
-            {
-                Id = i.IndumentariaId,
-                Codigo = i.Codigo,
-                Descripcion = i.Descripcion,
-                PrecioPublico = i.PrecioPublico ?? 0,
-                ImagenURL = i.ImagenUrl,
-                Talle = i.Talle,
-                Color = i.Color,
-                Genero = i.Genero,
-                TipoPrenda = i.TipoPrenda
-            });
-        }
-
-        // --- ABM ADMIN ---
-
         [HttpPost]
-        [Authorize(Roles = "Administrador")]
         public async Task<ActionResult> Create(IndumentariaAdminDTO dto)
         {
+            // 1. Validación
+            bool existe = await _repository.ExistsAsync(i => i.Codigo == dto.Codigo);
+            if (existe)
+                return BadRequest(new { title = "Código Duplicado", message = $"El código '{dto.Codigo}' ya existe en Indumentaria." });
+
+            // 2. Mapeo
             var nuevo = new Indumentarium
             {
                 Codigo = dto.Codigo,
                 Descripcion = dto.Descripcion,
-                PrecioCosto = dto.PrecioCosto,
                 PrecioPublico = dto.PrecioPublico,
-                Stock = dto.Stock,
-                Moneda = dto.Moneda,
-                Activo = dto.Activo,
-                ImagenUrl = dto.ImagenURL,
+                PrecioCosto = dto.PrecioCosto,
+                Stock = dto.Stock ?? 0,
+                ImagenUrl = dto.ImagenUrl,
                 Talle = dto.Talle,
-                Color = dto.Color,
                 Genero = dto.Genero,
                 TipoPrenda = dto.TipoPrenda,
+                Color = dto.Color,
+                Activo = true,
                 FechaAlta = DateTime.Now
             };
+
             await _repository.AddAsync(nuevo);
-            return Ok(new { mensaje = "Indumentaria creada", id = nuevo.IndumentariaId });
+            return Ok(new { message = "Indumentaria creada" });
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Administrador")]
-        public async Task<IActionResult> Update(int id, IndumentariaAdminDTO dto)
+        public async Task<ActionResult> Update(int id, IndumentariaAdminDTO dto)
         {
-            var item = await _repository.GetByIdAsync(id);
-            if (item == null) return NotFound();
+            var entity = await _repository.GetByIdAsync(id);
+            if (entity == null) return NotFound();
 
-            item.Codigo = dto.Codigo;
-            item.Descripcion = dto.Descripcion;
-            item.PrecioCosto = dto.PrecioCosto;
-            item.PrecioPublico = dto.PrecioPublico;
-            item.Stock = dto.Stock;
-            item.Moneda = dto.Moneda;
-            item.Activo = dto.Activo;
-            item.ImagenUrl = dto.ImagenURL;
-            item.Talle = dto.Talle;
-            item.Color = dto.Color;
-            item.Genero = dto.Genero;
-            item.TipoPrenda = dto.TipoPrenda;
+            entity.Descripcion = dto.Descripcion;
+            entity.PrecioPublico = dto.PrecioPublico;
+            entity.PrecioCosto = dto.PrecioCosto;
+            entity.Stock = dto.Stock ?? 0;
+            entity.ImagenUrl = dto.ImagenUrl;
+            entity.Talle = dto.Talle;
+            entity.Genero = dto.Genero;
+            entity.TipoPrenda = dto.TipoPrenda;
+            entity.Color = dto.Color;
 
-            await _repository.UpdateAsync(item);
-            return Ok(new { mensaje = "Indumentaria actualizada" });
+            await _repository.UpdateAsync(entity);
+            return Ok(new { message = "Indumentaria actualizada" });
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Administrador")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            var item = await _repository.GetByIdAsync(id);
-            if (item == null) return NotFound();
-            item.Activo = false;
-            await _repository.UpdateAsync(item);
-            return Ok(new { mensaje = "Indumentaria eliminada" });
+            var entity = await _repository.GetByIdAsync(id);
+            if (entity == null) return NotFound();
+
+            entity.Activo = false;
+            await _repository.UpdateAsync(entity);
+            return Ok(new { message = "Indumentaria eliminada" });
         }
     }
 }

@@ -2,13 +2,14 @@
 {
     public class RepuestoDTO
     {
-        public int Id { get; set; }
-        public string Codigo { get; set; } = string.Empty;
-        public string Descripcion { get; set; } = string.Empty;
-        public decimal PrecioPublico { get; set; }
-        public string? ImagenURL { get; set; }
-        public string? Categoria { get; set; }
-        public string? Compatibilidad { get; set; }
-        public string? MarcaComponente { get; set; }
+        public int RepuestoId { get; set; }   
+        public string Codigo { get; set; }
+        public string Descripcion { get; set; }
+        public decimal? PrecioPublico { get; set; } 
+        public int Stock { get; set; }         
+        public string ImagenUrl { get; set; }   
+        public string Categoria { get; set; }
+        public string Compatibilidad { get; set; }
+        public string MarcaComponente { get; set; }
     }
 }
