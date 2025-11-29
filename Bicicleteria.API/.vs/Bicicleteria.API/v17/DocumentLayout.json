@@ -242,7 +242,11 @@
               "RelativeDocumentMoniker": "Controllers\\IndumentariaController.cs",
               "ToolTip": "C:\\Users\\Ornella\\Documents\\Bicicleteria\\Bicicleteria-Web\\Bicicleteria.API\\Controllers\\IndumentariaController.cs",
               "RelativeToolTip": "Controllers\\IndumentariaController.cs",
+<<<<<<< HEAD
               "ViewState": "AgIAAEUAAAAAAAAAAAAAAE4AAAAsAAAAAAAAAA==",
+=======
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAAwAAAAAAAAAA==",
+>>>>>>> a8ff677224d80d549fdbea9dd309865bdcdc3125
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-27T12:13:46.866Z",
               "EditorCaption": ""
