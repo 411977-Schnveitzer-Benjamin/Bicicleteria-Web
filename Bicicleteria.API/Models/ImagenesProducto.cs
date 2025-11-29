@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Bicicleteria.API.Models;
 
@@ -7,7 +8,7 @@ public partial class ImagenesProducto
 {
     public int ImagenId { get; set; }
 
-    public string Urlimagen { get; set; } = null!;
+    public string imagenUrl { get; set; } = null!;
 
     public bool? EsPrincipal { get; set; }
 

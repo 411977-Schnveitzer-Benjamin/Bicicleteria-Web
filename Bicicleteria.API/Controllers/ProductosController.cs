@@ -37,7 +37,7 @@ namespace Bicicleteria.API.Controllers
                 Codigo = b.Codigo,
                 Descripcion = b.Descripcion,
                 Precio = b.PrecioPublico ?? 0,
-                ImagenURL = b.ImagenUrl,
+                imagenUrl = b.imagenUrl,
                 Tipo = "Bicicleta"
             }));
 
@@ -53,7 +53,7 @@ namespace Bicicleteria.API.Controllers
                 Codigo = r.Codigo,
                 Descripcion = r.Descripcion,
                 Precio = r.PrecioPublico ?? 0,
-                ImagenURL = r.ImagenUrl,
+                imagenUrl = r.imagenUrl,
                 Tipo = "Repuesto"
             }));
 
@@ -69,7 +69,7 @@ namespace Bicicleteria.API.Controllers
                 Codigo = i.Codigo,
                 Descripcion = i.Descripcion,
                 Precio = i.PrecioPublico ?? 0,
-                ImagenURL = i.ImagenUrl,
+                imagenUrl = i.imagenUrl,
                 Tipo = "Indumentaria"
             }));
 
@@ -96,7 +96,7 @@ namespace Bicicleteria.API.Controllers
                 Codigo = b.Codigo,
                 Descripcion = b.Descripcion,
                 Precio = b.PrecioPublico ?? 0,
-                ImagenURL = b.ImagenUrl,
+                imagenUrl = b.imagenUrl,
                 Tipo = "Bicicleta"
             }));
 
@@ -113,7 +113,7 @@ namespace Bicicleteria.API.Controllers
                 Codigo = r.Codigo,
                 Descripcion = r.Descripcion,
                 Precio = r.PrecioPublico ?? 0,
-                ImagenURL = r.ImagenUrl,
+                imagenUrl = r.imagenUrl,
                 Tipo = "Repuesto"
             }));
 
@@ -130,7 +130,7 @@ namespace Bicicleteria.API.Controllers
                 Codigo = i.Codigo,
                 Descripcion = i.Descripcion,
                 Precio = i.PrecioPublico ?? 0,
-                ImagenURL = i.ImagenUrl,
+                imagenUrl = i.imagenUrl,
                 Tipo = "Indumentaria"
             }));
 
@@ -161,7 +161,7 @@ namespace Bicicleteria.API.Controllers
                     descripcion = b.Descripcion,
                     precio = b.PrecioPublico,
                     stock = b.Stock,       // <--- Si esto falla en SQL, aquí saltará el error
-                    imagenUrl = b.ImagenUrl,
+                    imagenUrl = b.imagenUrl,
                     categoria = "Bicicletas",
                     talle = b.Rodado
                 }));
@@ -179,7 +179,7 @@ namespace Bicicleteria.API.Controllers
                     descripcion = r.Descripcion,
                     precio = r.PrecioPublico,
                     stock = r.Stock,
-                    imagenUrl = r.ImagenUrl,
+                    imagenUrl = r.imagenUrl,
                     categoria = "Repuestos",
                     talle = "-"
                 }));
@@ -199,7 +199,7 @@ namespace Bicicleteria.API.Controllers
                     descripcion = i.Descripcion,
                     precio = i.PrecioPublico,
                     stock = i.Stock,
-                    imagenUrl = i.ImagenUrl,
+                    imagenUrl = i.imagenUrl,
                     categoria = "Indumentaria",
                     talle = i.Talle
                 }));

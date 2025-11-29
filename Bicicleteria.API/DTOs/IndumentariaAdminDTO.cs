@@ -11,7 +11,7 @@
         public string Moneda { get; set; } = "ARS";
         public bool Activo { get; set; } = true;
 
-        public string? ImagenUrl { get; set; }
+        public string? imagenUrl { get; set; }
         public string? Talle { get; set; }
         public string? Color { get; set; }
         public string? Genero { get; set; }

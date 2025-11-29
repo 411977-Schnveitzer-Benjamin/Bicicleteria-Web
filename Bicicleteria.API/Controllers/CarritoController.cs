@@ -51,9 +51,9 @@ namespace Bicicleteria.API.Controllers
                                  ?? c.Repuesto?.PrecioPublico
                                  ?? c.Indumentaria?.PrecioPublico) ?? 0,
 
-                ImagenURL = c.Bicicleta?.ImagenUrl
-                            ?? c.Repuesto?.ImagenUrl
-                            ?? c.Indumentaria?.ImagenUrl,
+                ImagenURL = c.Bicicleta?.imagenUrl
+                            ?? c.Repuesto?.imagenUrl
+                            ?? c.Indumentaria?.imagenUrl,
 
                 Tipo = c.BicicletaId != null ? "BICI" : (c.RepuestoId != null ? "REPUESTO" : "ROPA"),
 

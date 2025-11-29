@@ -13,7 +13,7 @@
         public bool Activo { get; set; } = true;
 
         // Detalles
-        public string? ImagenUrl { get; set; }
+        public string? imagenUrl { get; set; }
         public string? Rodado { get; set; }
         public string? Velocidades { get; set; }
         public string? Marca { get; set; }

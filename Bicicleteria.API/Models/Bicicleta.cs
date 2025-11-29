@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Bicicleteria.API.Models;
 
@@ -29,7 +30,7 @@ public partial class Bicicleta
 
     public string? Color { get; set; }
 
-    public string? ImagenUrl { get; set; }
+    public string? imagenUrl { get; set; }
 
     public DateTime? FechaAlta { get; set; }
 

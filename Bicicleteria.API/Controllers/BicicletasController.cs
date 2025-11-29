@@ -31,7 +31,7 @@ namespace Bicicleteria.API.Controllers
                 Descripcion = b.Descripcion,
                 PrecioPublico = b.PrecioPublico,
                 Stock = b.Stock ?? 0, 
-                ImagenUrl = b.ImagenUrl,
+                imagenUrl = b.imagenUrl,
                 Rodado = b.Rodado,
                 Velocidades = b.Velocidades,
                 Marca = b.Marca,
@@ -55,7 +55,7 @@ namespace Bicicleteria.API.Controllers
                 Descripcion = b.Descripcion,
                 PrecioPublico = b.PrecioPublico,
                 Stock = b.Stock ?? 0,
-                ImagenUrl = b.ImagenUrl,
+                imagenUrl = b.imagenUrl,
                 Rodado = b.Rodado,
                 Velocidades = b.Velocidades,
                 Marca = b.Marca,
@@ -67,7 +67,7 @@ namespace Bicicleteria.API.Controllers
 
         // POST: api/Bicicletas
         [HttpPost]
-        // [Authorize(Roles = "Administrador")] // Descomenta cuando tengas el Auth listo
+        [Authorize(Roles = "Administrador")]
         public async Task<ActionResult> Create(BicicletaAdminDTO dto)
         {
             // 1. VERIFICACIÓN DE DUPLICADOS
@@ -85,7 +85,7 @@ namespace Bicicleteria.API.Controllers
                 PrecioPublico = dto.PrecioPublico,
                 PrecioCosto = dto.PrecioCosto,
                 Stock = dto.Stock ?? 0,
-                ImagenUrl = dto.ImagenUrl,
+                imagenUrl = dto.imagenUrl,
                 Rodado = dto.Rodado,
                 Velocidades = dto.Velocidades,
                 Marca = dto.Marca,
@@ -111,7 +111,7 @@ namespace Bicicleteria.API.Controllers
             biciExistente.PrecioPublico = dto.PrecioPublico;
             biciExistente.PrecioCosto = dto.PrecioCosto;
             biciExistente.Stock = dto.Stock ?? 0;
-            biciExistente.ImagenUrl = dto.ImagenUrl;
+            biciExistente.imagenUrl = dto.imagenUrl;
             biciExistente.Rodado = dto.Rodado;
             biciExistente.Velocidades = dto.Velocidades;
             biciExistente.Marca = dto.Marca;
@@ -126,5 +126,3 @@ namespace Bicicleteria.API.Controllers
         }
     }
 }
-
-// DELETE: api

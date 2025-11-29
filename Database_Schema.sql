@@ -307,4 +307,12 @@ BEGIN
 END
 GO
 
+ALTER TABLE Bicicletas ALTER COLUMN ImagenUrl NVARCHAR(MAX);
+ALTER TABLE Repuestos ALTER COLUMN ImagenUrl NVARCHAR(MAX);
+ALTER TABLE Indumentaria ALTER COLUMN ImagenUrl NVARCHAR(MAX);
+
+EXEC sp_rename 'Bicicletas.ImagenURL', 'ImagenUrl', 'COLUMN';
+EXEC sp_rename 'Repuestos.ImagenURL', 'ImagenUrl', 'COLUMN';
+EXEC sp_rename 'Indumentaria.ImagenURL', 'ImagenUrl', 'COLUMN';
+
 select * from Bicicletas

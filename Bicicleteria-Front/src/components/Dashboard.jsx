@@ -447,7 +447,7 @@ const CreateProductModal = ({ isOpen, onClose, onSave }) => {
   const [loading, setLoading] = useState(false);
   const [images, setImages] = useState([]); 
   const [formData, setFormData] = useState({
-    codigo: '', descripcion: '', precioPublico: '', stock: '', imagenURL: '',
+    codigo: '', descripcion: '', precioPublico: '', stock: '', imagenUrl: '',
     rodado: '', velocidades: '', marca: '', color: '', 
     categoria: '', compatibilidad: '', 
     talle: '', genero: '', tipoPrenda: '' 
@@ -471,50 +471,63 @@ const CreateProductModal = ({ isOpen, onClose, onSave }) => {
   };
 
   // --- SUBIDA A CLOUDINARY (fetch sin Authorization) ---
-  const handleFileChange = async (e) => {
-    const files = Array.from(e.target.files);
-    if (files.length === 0) return;
+const handleFileChange = async (e) => {
+  const files = e.target.files;
 
-    const file = files[0];
+  if (!files || files.length === 0) {
+    console.warn("No se seleccionó ninguna imagen.");
+    return; // ⚠ Evita crasheo
+  }
+
+  const file = files[0];
+
+  // Validar que sea imagen
+  if (!file.type.startsWith("image/")) {
+    alert("Solo se permiten imágenes.");
+    return;
+  }
+
+  // Generar preview seguro
+  try {
     const previewUrl = URL.createObjectURL(file);
+
     setImages([{ file, preview: previewUrl }]);
 
-    // Preparar datos para Cloudinary
-    const formDataUpload = new FormData();
-    formDataUpload.append('file', file);
-    formDataUpload.append('upload_preset', UPLOAD_PRESET); 
-    formDataUpload.append('cloud_name', CLOUD_NAME);
+    // Liberar memoria cuando la imagen ya no se necesite
+    return () => URL.revokeObjectURL(previewUrl);
+  } catch (err) {
+    console.error("Error creando preview:", err);
+    return;
+  }
 
-    try {
-      // Usamos FETCH para evitar el error de CORS y NO tocar tu backend local
-      const response = await fetch(
-        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, 
-        {
-          method: 'POST',
-          body: formDataUpload
-        }
-      );
 
-      const data = await response.json();
+  // --- SUBIDA CLOUDINARY ---
+  const formDataUpload = new FormData();
+  formDataUpload.append("file", file);
+  formDataUpload.append("upload_preset", UPLOAD_PRESET);
 
-      if (!response.ok) {
-        throw new Error(data.error?.message || "Error de Cloudinary");
-      }
+  try {
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+      { method: "POST", body: formDataUpload }
+    );
 
-      const urlReal = data.secure_url;
-      setFormData(prev => ({ ...prev, imagenURL: urlReal }));
-      console.log("Subida exitosa:", urlReal);
+    const data = await response.json();
 
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Error al subir: " + error.message);
-      setImages([]); // Limpiar si falla
-    }
-  };
+    if (!response.ok) throw new Error(data.error?.message);
+
+    setFormData((prev) => ({ ...prev, imagenUrl: data.secure_url }));
+  } catch (error) {
+    console.error("Error subiendo a Cloudinary:", error);
+    alert("Error subiendo imagen: " + error.message);
+    setImages([]);
+  }
+};
+
 
   const removeImage = (index) => {
     setImages(prev => prev.filter((_, i) => i !== index));
-    if (images.length === 1) setFormData(prev => ({ ...prev, imagenURL: '' }));
+    if (images.length === 1) setFormData(prev => ({ ...prev, imagenUrl: '' }));
   };
 
   const handleSubmit = async (e) => {
@@ -533,20 +546,20 @@ const CreateProductModal = ({ isOpen, onClose, onSave }) => {
       precioPublico: Number(formData.precioPublico),
       precioCosto: Number(formData.precioPublico) * 0.7, 
       stock: Number(formData.stock),
-      imagenURL: formData.imagenURL || (images.length > 0 ? "https://placehold.co/400" : ""),
+      ImagenUrl: formData.imagenUrl || (images.length > 0 ? "https://placehold.co/400" : ""),
       moneda: 'ARS',
       activo: true
     };
 
     if (type === 'Bicicleta') {
       endpoint = '/Bicicletas';
-      payload = { ...payload, rodado: formData.rodado, velocidades: formData.velocidades, marca: formData.marca, color: formData.color, frenos: 'V-Brake' };
+      payload = { ...payload,imagenUrl: formData.imagenUrl, rodado: formData.rodado, velocidades: formData.velocidades, marca: formData.marca, color: formData.color, frenos: 'V-Brake' };
     } else if (type === 'Repuesto') {
       endpoint = '/Repuestos';
-      payload = { ...payload, categoria: formData.categoria, compatibilidad: formData.compatibilidad, marcaComponente: formData.marca };
+      payload = { ...payload, imagenUrl: formData.imagenUrl, categoria: formData.categoria, compatibilidad: formData.compatibilidad, marcaComponente: formData.marca };
     } else {
       endpoint = '/Indumentaria';
-      payload = { ...payload, talle: formData.talle, color: formData.color, genero: formData.genero, tipoPrenda: formData.tipoPrenda };
+      payload = { ...payload, imagenUrl: formData.imagenUrl, talle: formData.talle, color: formData.color, genero: formData.genero, tipoPrenda: formData.tipoPrenda };
     }
 
     try {
@@ -595,7 +608,7 @@ const CreateProductModal = ({ isOpen, onClose, onSave }) => {
                   ))}
                 </div>
               )}
-              <div className="relative"><div className="absolute inset-y-0 left-3 flex items-center pointer-events-none"><ImageIcon size={14} className="text-gray-600"/></div><input name="imagenURL" placeholder="O pega una URL externa..." value={formData.imagenURL} onChange={handleChange} className="w-full bg-black/20 border border-white/10 rounded-lg py-2 pl-9 pr-3 text-xs text-white focus:border-cairo-orange focus:outline-none placeholder-gray-700"/></div>
+              <div className="relative"><div className="absolute inset-y-0 left-3 flex items-center pointer-events-none"><ImageIcon size={14} className="text-gray-600"/></div><input name="imagenUrl" placeholder="O pega una URL externa..." value={formData.imagenUrl} onChange={handleChange} className="w-full bg-black/20 border border-white/10 rounded-lg py-2 pl-9 pr-3 text-xs text-white focus:border-cairo-orange focus:outline-none placeholder-gray-700"/></div>
             </div>
             <div className="md:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input name="codigo" label="Código (SKU)" value={formData.codigo} onChange={handleChange} onBlur={handleBlur} required error={touched.codigo && !formData.codigo} />
