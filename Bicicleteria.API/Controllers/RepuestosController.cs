@@ -28,7 +28,7 @@ namespace Bicicleteria.API.Controllers
                 Descripcion = r.Descripcion,
                 PrecioPublico = r.PrecioPublico,
                 Stock = r.Stock ?? 0,
-                ImagenUrl = r.ImagenUrl,
+                imagenUrl = r.imagenUrl,
                 Categoria = r.Categoria,
                 Compatibilidad = r.Compatibilidad,
                 MarcaComponente = r.MarcaComponente
@@ -52,7 +52,7 @@ namespace Bicicleteria.API.Controllers
                 PrecioPublico = dto.PrecioPublico,
                 PrecioCosto = dto.PrecioCosto,
                 Stock = dto.Stock ?? 0,
-                ImagenUrl = dto.ImagenUrl,
+                imagenUrl = dto.imagenUrl,
                 Categoria = dto.Categoria,
                 Compatibilidad = dto.Compatibilidad,
                 MarcaComponente = dto.MarcaComponente,
@@ -74,7 +74,7 @@ namespace Bicicleteria.API.Controllers
             entity.PrecioPublico = dto.PrecioPublico;
             entity.PrecioCosto = dto.PrecioCosto;
             entity.Stock = dto.Stock ?? 0;
-            entity.ImagenUrl = dto.ImagenUrl;
+            entity.imagenUrl = dto.imagenUrl;
             entity.Categoria = dto.Categoria;
             entity.Compatibilidad = dto.Compatibilidad;
             entity.MarcaComponente = dto.MarcaComponente;
