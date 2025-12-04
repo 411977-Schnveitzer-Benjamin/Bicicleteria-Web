@@ -146,8 +146,7 @@
                 entity.Property(e => e.Descripcion).HasMaxLength(1000).IsUnicode(false);
                 entity.Property(e => e.FechaAlta).HasDefaultValueSql("(getdate())").HasColumnType("datetime");
                 entity.Property(e => e.Genero).HasMaxLength(20).IsUnicode(false);
-                entity.Property(e => e.imagenUrl).IsUnicode(false).HasColumnName("ImagenURL");
-                entity.Property(e => e.Moneda).HasMaxLength(3).IsUnicode(false).HasDefaultValue("ARS");
+                entity.Property(e => e.imagenUrl).HasColumnName("ImagenURL"); entity.Property(e => e.Moneda).HasMaxLength(3).IsUnicode(false).HasDefaultValue("ARS");
                 entity.Property(e => e.PrecioCosto).HasDefaultValue(0m).HasColumnType("decimal(18, 2)");
                 entity.Property(e => e.PrecioPublico).HasDefaultValue(0m).HasColumnType("decimal(18, 2)");
                 entity.Property(e => e.Stock).HasDefaultValue(0);
