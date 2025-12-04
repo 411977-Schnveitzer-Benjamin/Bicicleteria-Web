@@ -315,4 +315,7 @@ EXEC sp_rename 'Bicicletas.ImagenURL', 'ImagenUrl', 'COLUMN';
 EXEC sp_rename 'Repuestos.ImagenURL', 'ImagenUrl', 'COLUMN';
 EXEC sp_rename 'Indumentaria.ImagenURL', 'ImagenUrl', 'COLUMN';
 
-select * from Bicicletas
+SELECT COLUMN_NAME
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'Bicicletas';
+
