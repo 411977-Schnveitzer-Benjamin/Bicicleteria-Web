@@ -43,7 +43,8 @@
                 entity.Property(e => e.Descripcion).HasMaxLength(1000).IsUnicode(false);
                 entity.Property(e => e.FechaAlta).HasDefaultValueSql("(getdate())").HasColumnType("datetime");
                 entity.Property(e => e.Frenos).HasMaxLength(50).IsUnicode(false);
-                entity.Property(e => e.imagenUrl).HasColumnName("ImagenURL"); entity.Property(e => e.Marca).HasMaxLength(50).IsUnicode(false);
+                entity.Property(e => e.imagenUrl).HasColumnName("ImagenURL"); 
+                entity.Property(e => e.Marca).HasMaxLength(50).IsUnicode(false);
                 entity.Property(e => e.MarcaId).HasColumnName("MarcaID");
                 entity.Property(e => e.Moneda).HasMaxLength(3).IsUnicode(false).HasDefaultValue("ARS");
                 entity.Property(e => e.PrecioCosto).HasDefaultValue(0m).HasColumnType("decimal(18, 2)");
@@ -146,7 +147,7 @@
                 entity.Property(e => e.Descripcion).HasMaxLength(1000).IsUnicode(false);
                 entity.Property(e => e.FechaAlta).HasDefaultValueSql("(getdate())").HasColumnType("datetime");
                 entity.Property(e => e.Genero).HasMaxLength(20).IsUnicode(false);
-                entity.Property(e => e.imagenUrl).HasColumnName("ImagenURL"); entity.Property(e => e.Moneda).HasMaxLength(3).IsUnicode(false).HasDefaultValue("ARS");
+                entity.Property(e => e.imagenUrl).HasColumnName("ImagenURL"); 
                 entity.Property(e => e.PrecioCosto).HasDefaultValue(0m).HasColumnType("decimal(18, 2)");
                 entity.Property(e => e.PrecioPublico).HasDefaultValue(0m).HasColumnType("decimal(18, 2)");
                 entity.Property(e => e.Stock).HasDefaultValue(0);
@@ -183,7 +184,8 @@
                 entity.Property(e => e.Compatibilidad).HasMaxLength(200).IsUnicode(false);
                 entity.Property(e => e.Descripcion).HasMaxLength(1000).IsUnicode(false);
                 entity.Property(e => e.FechaAlta).HasDefaultValueSql("(getdate())").HasColumnType("datetime");
-                entity.Property(e => e.imagenUrl).HasColumnName("ImagenURL"); entity.Property(e => e.MarcaComponente).HasMaxLength(50).IsUnicode(false);
+                entity.Property(e => e.imagenUrl).HasColumnName("ImagenURL"); 
+                entity.Property(e => e.MarcaComponente).HasMaxLength(50).IsUnicode(false);
                 entity.Property(e => e.Moneda).HasMaxLength(3).IsUnicode(false).HasDefaultValue("ARS");
                 entity.Property(e => e.PrecioCosto).HasDefaultValue(0m).HasColumnType("decimal(18, 2)");
                 entity.Property(e => e.PrecioPublico).HasDefaultValue(0m).HasColumnType("decimal(18, 2)");
