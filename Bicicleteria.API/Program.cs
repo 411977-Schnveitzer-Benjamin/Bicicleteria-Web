@@ -4,15 +4,16 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
-using System.Text.Json.Serialization;
 using Bicicleteria.API.Repositories;
 using Bicicleteria.API.Interfaces;
+using System.Text.Json.Serialization; // <--- 1. IMPORTANTE: Agrega este using
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. SERVICIOS
+// 2. IMPORTANTE: Cambia AddControllers por esto para evitar el cierre inesperado
 builder.Services.AddControllers().AddJsonOptions(x =>
    x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+
 builder.Services.AddEndpointsApiExplorer();
 
 // Configurar Swagger
@@ -43,9 +44,8 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddDbContext<BicicleteriaWebContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// --- INYECCIÓN DE DEPENDENCIAS (REPOSITORIOS) ---
+// Inyección de Dependencias
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-// ------------------------------------------------
 
 // Configurar JWT
 var key = builder.Configuration["Jwt:Key"];
@@ -63,14 +63,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddCors(o => o.AddPolicy("PermitirTodo", p => p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
-
-// Habilitar CORS para que React pueda pedir datos
+// Configurar CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("NuevaPolitica", app =>
     {
-        app.AllowAnyOrigin()   // En producción cambiar por la URL real
+        app.AllowAnyOrigin()
            .AllowAnyHeader()
            .AllowAnyMethod();
     });
@@ -78,16 +76,12 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// 2. MIDDLEWARES
+// Middlewares
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-//app.UseHttpsRedirection();
-app.UseCors("PermitirTodo");
-app.UseRouting();
 
 app.UseCors("NuevaPolitica");
 app.UseAuthentication();
