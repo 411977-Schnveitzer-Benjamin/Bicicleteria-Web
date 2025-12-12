@@ -3,8 +3,20 @@
   "WorkspaceRootPath": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Forms de Prueba\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{E5208404-B06A-4186-A285-4CFE896F578C}|Forms de Prueba.csproj|c:\\users\\bschn\\desktop\\web bicicleteria\\bicicleteria-web\\forms de prueba\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E5208404-B06A-4186-A285-4CFE896F578C}|Forms de Prueba.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{E5208404-B06A-4186-A285-4CFE896F578C}|Forms de Prueba.csproj|c:\\users\\bschn\\desktop\\web bicicleteria\\bicicleteria-web\\forms de prueba\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{E5208404-B06A-4186-A285-4CFE896F578C}|Forms de Prueba.csproj|solutionrelative:form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5208404-B06A-4186-A285-4CFE896F578C}|Forms de Prueba.csproj|c:\\users\\bschn\\desktop\\web bicicleteria\\bicicleteria-web\\forms de prueba\\forms de prueba.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{E5208404-B06A-4186-A285-4CFE896F578C}|Forms de Prueba.csproj|solutionrelative:forms de prueba.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5208404-B06A-4186-A285-4CFE896F578C}|Forms de Prueba.csproj|c:\\users\\bschn\\desktop\\web bicicleteria\\bicicleteria-web\\forms de prueba\\form1.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E5208404-B06A-4186-A285-4CFE896F578C}|Forms de Prueba.csproj|solutionrelative:form1.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,8 +26,47 @@
       "DocumentGroups": [
         {
           "DockedHeight": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 1,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Forms de Prueba",
+              "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Forms de Prueba\\Forms de Prueba.csproj",
+              "RelativeDocumentMoniker": "Forms de Prueba.csproj",
+              "ToolTip": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Forms de Prueba\\Forms de Prueba.csproj",
+              "RelativeToolTip": "Forms de Prueba.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-12-01T23:14:28.203Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Forms de Prueba\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Forms de Prueba\\Program.cs*",
+              "RelativeToolTip": "Program.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-01T23:14:09.029Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Form1.Designer.cs",
+              "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Forms de Prueba\\Form1.Designer.cs",
+              "RelativeDocumentMoniker": "Form1.Designer.cs",
+              "ToolTip": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Forms de Prueba\\Form1.Designer.cs*",
+              "RelativeToolTip": "Form1.Designer.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-01T22:48:30.985Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{e5c86464-96be-4d7c-9a8b-abcb3bbf5f92}"
@@ -38,15 +89,15 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Form1.cs [Design]",
+              "DocumentIndex": 1,
+              "Title": "Form1.cs [Dise\u00F1o]",
               "DocumentMoniker": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Forms de Prueba\\Form1.cs",
               "RelativeDocumentMoniker": "Form1.cs",
-              "ToolTip": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Forms de Prueba\\Form1.cs [Design]",
-              "RelativeToolTip": "Form1.cs [Design]",
+              "ToolTip": "C:\\Users\\bschn\\Desktop\\Web Bicicleteria\\Bicicleteria-Web\\Forms de Prueba\\Form1.cs [Dise\u00F1o]*",
+              "RelativeToolTip": "Form1.cs [Dise\u00F1o]*",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-12-01T22:47:42.644Z",
-              "EditorCaption": " [Design]"
+              "EditorCaption": " [Dise\u00F1o]"
             }
           ]
         },

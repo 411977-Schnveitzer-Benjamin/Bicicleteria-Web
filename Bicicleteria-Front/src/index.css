@@ -42,7 +42,7 @@
 @layer components {
   /* Botón con gradiente animado */
   .btn-fire {
-    @apply relative overflow-hidden rounded-full bg-gradient-to-r from-cairo-red via-cairo-orange to-cairo-yellow px-8 py-3 font-bold text-white shadow-lg transition-transform hover:scale-105 active:scale-95 cursor-pointer;
+    @apply relative overflow-hidden rounded-full bg-linear-to-r from-cairo-red via-cairo-orange to-cairo-yellow px-8 py-3 font-bold text-white shadow-lg transition-transform hover:scale-105 active:scale-95 cursor-pointer;
     background-size: 200% auto;
     animation: shine 3s linear infinite;
   }

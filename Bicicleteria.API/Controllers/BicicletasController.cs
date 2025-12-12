@@ -87,10 +87,8 @@ namespace Bicicleteria.API.Controllers
                 Stock = dto.Stock ?? 0,
                 imagenUrl = dto.imagenUrl,
                 Rodado = dto.Rodado,
-                Velocidades = dto.Velocidades,
                 Marca = dto.Marca,
                 Color = dto.Color,
-                Frenos = dto.Frenos,
                 Activo = true,
                 FechaAlta = DateTime.Now
             };

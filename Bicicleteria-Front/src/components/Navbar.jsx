@@ -103,7 +103,7 @@ const Navbar = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-[60] bg-cairo-dark/95 backdrop-blur-xl flex flex-col items-center justify-center space-y-8"
+            className="fixed inset-0 z-60 bg-cairo-dark/95 backdrop-blur-xl flex flex-col items-center justify-center space-y-8"
           >
             <button onClick={() => setIsMenuOpen(false)} className="absolute top-6 right-6 text-white hover:text-cairo-red">
               <X size={40} />

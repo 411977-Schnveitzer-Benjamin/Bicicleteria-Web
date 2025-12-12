@@ -11,6 +11,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // --- URL BASE (HTTPS) ---
+// Ajusta esto a tu URL real cuando subas a producción
 const BASE_URL = 'https://localhost:7222/api';
 
 // --- CLOUDINARY CONFIG ---
@@ -72,14 +73,14 @@ const Dashboard = () => {
 
         <div className="pt-6 border-t border-white/10 mt-auto">
           <div className="flex items-center gap-3 p-2 rounded-xl bg-white/5 border border-white/5 hover:border-cairo-orange/30 transition-colors group">
-             <div className="h-10 w-10 min-w-[2.5rem] rounded-full bg-cairo-orange/20 border border-cairo-orange/50 flex items-center justify-center text-cairo-orange font-bold shadow-sm group-hover:scale-105 transition-transform">
+             <div className="h-10 w-10 min-w-10 rounded-full bg-orange-500/20 border border-orange-500/50 flex items-center justify-center text-orange-500 font-bold shadow-sm group-hover:scale-105 transition-transform">
                 {displayName.charAt(0).toUpperCase()}
              </div>
              <div className="flex-1 overflow-hidden">
                <p className="text-xs font-bold text-white truncate" title={displayName}>{displayName}</p>
                <p className="text-[10px] text-gray-400 font-medium truncate group-hover:text-gray-300 transition-colors" title={displayEmail}>{displayEmail}</p>
              </div>
-             <button onClick={handleLogout} className="p-2 text-gray-500 hover:text-cairo-red hover:bg-white/10 rounded-lg transition-all" title="Cerrar Sesión">
+             <button onClick={handleLogout} className="p-2 text-gray-500 hover:text-red-500 hover:bg-white/10 rounded-lg transition-all" title="Cerrar Sesión">
                 <LogOut size={18}/>
              </button>
           </div>
@@ -88,35 +89,36 @@ const Dashboard = () => {
 
       {/* --- AREA PRINCIPAL --- */}
       <main className="flex-1 overflow-y-auto relative p-8">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-cairo-red/5 rounded-full blur-[120px] -z-10" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-cairo-yellow/5 rounded-full blur-[120px] -z-10" />
+        {/* Fondos decorativos */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-red-500/5 rounded-full blur-[120px] -z-10" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-yellow-500/5 rounded-full blur-[120px] -z-10" />
 
         <div className="max-w-6xl mx-auto">
           
           {/* 1. VISTA DE ESTADÍSTICAS */}
           {activeTab === 'estadisticas' && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-              <h2 className="text-4xl font-brand text-white mb-8 border-b border-white/10 pb-4">Resumen General</h2>
+              <h2 className="text-4xl font-bold text-white mb-8 border-b border-white/10 pb-4">Resumen General</h2>
               
               {statsLoading ? (
                  <div className="flex items-center gap-2 text-white"><Loader className="animate-spin"/> Cargando datos...</div>
               ) : statsError ? (
-                 <div className="text-cairo-red p-4 border border-cairo-red/20 rounded-lg bg-cairo-red/5">{statsError}</div>
+                 <div className="text-red-400 p-4 border border-red-500/20 rounded-lg bg-red-500/5">{statsError}</div>
               ) : (
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <StatCard title="Ventas Mensuales" value={`$${statsData?.totalVendidoMes.toLocaleString()}`} icon={<DollarSign/>} color="text-green-400" />
-                    <StatCard title="Pedidos" value={statsData?.cantidadVentasMes} icon={<ShoppingCart/>} color="text-cairo-yellow" />
-                    <StatCard title="Clientes Nuevos" value={statsData?.clientesNuevosMes} icon={<Users/>} color="text-cairo-orange" />
+                    <StatCard title="Ventas Mensuales" value={`$${statsData?.totalVendidoMes?.toLocaleString() || 0}`} icon={<DollarSign/>} color="text-green-400" />
+                    <StatCard title="Pedidos" value={statsData?.cantidadVentasMes || 0} icon={<ShoppingCart/>} color="text-yellow-400" />
+                    <StatCard title="Clientes Nuevos" value={statsData?.clientesNuevosMes || 0} icon={<Users/>} color="text-orange-400" />
                   </div>
 
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div className="glass-panel p-6 rounded-2xl border border-white/10">
-                      <h3 className="font-brand text-2xl text-white mb-4 flex items-center gap-2">
-                        <Activity size={20} className="text-cairo-yellow"/> Últimas Ventas
+                    <div className="bg-white/5 p-6 rounded-2xl border border-white/10">
+                      <h3 className="font-bold text-2xl text-white mb-4 flex items-center gap-2">
+                        <Activity size={20} className="text-yellow-400"/> Últimas Ventas
                       </h3>
                       <div className="space-y-3">
-                        {statsData?.ultimasVentas.map(v => (
+                        {statsData?.ultimasVentas?.map(v => (
                           <div key={v.id} className="flex justify-between items-center p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
                             <div><p className="text-sm font-bold text-white">{v.cliente}</p><p className="text-xs text-gray-500">{v.fecha}</p></div>
                             <div className="text-right"><p className="text-sm font-bold text-green-400">${v.total.toLocaleString()}</p><span className="text-[10px] uppercase text-gray-400">{v.estado}</span></div>
@@ -125,18 +127,18 @@ const Dashboard = () => {
                       </div>
                     </div>
 
-                    <div className="glass-panel p-6 rounded-2xl border border-cairo-red/20 relative overflow-hidden">
-                      <h3 className="font-brand text-2xl text-cairo-red mb-4 flex items-center gap-2">
+                    <div className="bg-white/5 p-6 rounded-2xl border border-red-500/20 relative overflow-hidden">
+                      <h3 className="font-bold text-2xl text-red-400 mb-4 flex items-center gap-2">
                         <AlertTriangle size={20}/> Alertas de Stock
                       </h3>
                       <div className="space-y-3">
-                        {statsData?.productosBajoStock.map((p, i) => (
+                        {statsData?.productosBajoStock?.map((p, i) => (
                           <div key={i} className="flex justify-between items-center p-3 bg-black/20 border border-white/5 rounded-lg">
-                            <div><p className="text-sm font-bold text-gray-200">{p.descripcion}</p><p className="text-[10px] font-bold text-cairo-orange uppercase">{p.tipo} • {p.codigo}</p></div>
-                            <div className="px-3 py-1 bg-cairo-red/10 border border-cairo-red/20 rounded text-cairo-red font-bold">{p.stock} <span className="text-[8px]">Unid.</span></div>
+                            <div><p className="text-sm font-bold text-gray-200">{p.descripcion}</p><p className="text-[10px] font-bold text-orange-400 uppercase">{p.tipo} • {p.codigo}</p></div>
+                            <div className="px-3 py-1 bg-red-500/10 border border-red-500/20 rounded text-red-400 font-bold">{p.stock} <span className="text-[8px]">Unid.</span></div>
                           </div>
                         ))}
-                         {statsData?.productosBajoStock.length === 0 && <p className="text-green-500 text-sm">¡Stock en orden!</p>}
+                         {statsData?.productosBajoStock?.length === 0 && <p className="text-green-500 text-sm">¡Stock en orden!</p>}
                       </div>
                     </div>
                   </div>
@@ -145,7 +147,7 @@ const Dashboard = () => {
             </motion.div>
           )}
 
-          {/* 2. VISTA DE PRODUCTOS (REAL) */}
+          {/* 2. VISTA DE PRODUCTOS */}
           {activeTab === 'productos' && <ProductsView />}
 
           {/* 3. VISTA DE CONFIGURACIÓN */}
@@ -242,66 +244,66 @@ const ProductsView = () => {
       
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-          <h2 className="text-4xl font-brand text-white">Productos</h2>
+          <h2 className="text-4xl font-bold text-white">Productos</h2>
           <p className="text-gray-400 text-sm">Inventario general ({products.length} ítems)</p>
         </div>
         <button 
           onClick={() => setIsCreateModalOpen(true)}
-          className="btn-fire flex items-center gap-2 text-sm px-6 py-2.5 shadow-lg shadow-cairo-orange/20"
+          className="bg-orange-500 hover:bg-orange-600 text-white font-bold flex items-center gap-2 text-sm px-6 py-2.5 rounded-lg shadow-lg shadow-orange-500/20 transition-all"
         >
           <Plus size={18} /> Crear Nuevo
         </button>
       </div>
 
-      <div className="glass-panel p-4 rounded-2xl mb-6 flex flex-col lg:flex-row gap-4 items-center justify-between border border-white/10">
+      <div className="bg-white/5 p-4 rounded-2xl mb-6 flex flex-col lg:flex-row gap-4 items-center justify-between border border-white/10">
         <div className="relative w-full lg:w-96 group">
-          <Search className="absolute left-3 top-3 text-gray-500 group-focus-within:text-cairo-orange transition-colors" size={20} />
+          <Search className="absolute left-3 top-3 text-gray-500 group-focus-within:text-orange-500 transition-colors" size={20} />
           <input
             type="text"
             placeholder="Buscar por nombre o código..."
-            className="w-full bg-black/40 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-cairo-orange focus:bg-black/60 transition-all"
+            className="w-full bg-black/40 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-orange-500 focus:bg-black/60 transition-all"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
           <div className="flex items-center gap-2 bg-black/40 border border-white/10 px-3 py-2.5 rounded-xl hover:border-white/20 transition-colors">
-            <Filter size={16} className="text-cairo-yellow" />
+            <Filter size={16} className="text-yellow-400" />
             <select
               className="bg-transparent text-white text-sm focus:outline-none cursor-pointer w-32"
               value={filters.categoria}
               onChange={(e) => setFilters({ ...filters, categoria: e.target.value })}
             >
-              <option value="" className="bg-cairo-dark">Categoría</option>
-              <option value="Bicicletas" className="bg-cairo-dark">Bicicletas</option>
-              <option value="Repuestos" className="bg-cairo-dark">Repuestos</option>
-              <option value="Indumentaria" className="bg-cairo-dark">Indumentaria</option>
+              <option value="" className="bg-[#111]">Categoría</option>
+              <option value="Bicicletas" className="bg-[#111]">Bicicletas</option>
+              <option value="Repuestos" className="bg-[#111]">Repuestos</option>
+              <option value="Indumentaria" className="bg-[#111]">Indumentaria</option>
             </select>
           </div>
           <div className="flex items-center gap-2 bg-black/40 border border-white/10 px-3 py-2.5 rounded-xl hover:border-white/20 transition-colors">
-            <ArrowUpDown size={16} className="text-cairo-orange" />
+            <ArrowUpDown size={16} className="text-orange-500" />
             <select
               className="bg-transparent text-white text-sm focus:outline-none cursor-pointer w-32"
               value={sortOrder}
               onChange={(e) => setSortOrder(e.target.value)}
             >
-              <option value="az" className="bg-cairo-dark">A-Z</option>
-              <option value="za" className="bg-cairo-dark">Z-A</option>
-              <option value="price-asc" className="bg-cairo-dark">$ Menor</option>
-              <option value="price-desc" className="bg-cairo-dark">$ Mayor</option>
+              <option value="az" className="bg-[#111]">A-Z</option>
+              <option value="za" className="bg-[#111]">Z-A</option>
+              <option value="price-asc" className="bg-[#111]">$ Menor</option>
+              <option value="price-desc" className="bg-[#111]">$ Mayor</option>
             </select>
           </div>
         </div>
       </div>
 
-      <div className="glass-panel rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+      <div className="bg-white/5 rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
         {loading ? (
            <div className="p-12 text-center text-white flex flex-col items-center">
               <Loader className="animate-spin mb-2" size={32}/>
               <p>Cargando inventario...</p>
            </div>
         ) : error ? (
-           <div className="p-12 text-center text-cairo-red">{error}</div>
+           <div className="p-12 text-center text-red-400">{error}</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-center border-collapse">
@@ -310,7 +312,7 @@ const ProductsView = () => {
                   <th className="p-4 w-12 text-center">
                     <button onClick={handleSelectAll} className="text-gray-400 hover:text-white transition-colors">
                       {selectedIds.length > 0 && selectedIds.length === filteredProducts.length 
-                        ? <CheckSquare size={20} className="text-cairo-orange"/> 
+                        ? <CheckSquare size={20} className="text-orange-500"/> 
                         : <Square size={20}/>
                       }
                     </button>
@@ -336,19 +338,19 @@ const ProductsView = () => {
                   const pTalle = product.talle || product.rodado || "-";
 
                   return (
-                    <tr key={pId} className={`transition-colors group ${isSelected ? 'bg-cairo-orange/10' : 'hover:bg-white/5'}`}>
+                    <tr key={pId} className={`transition-colors group ${isSelected ? 'bg-orange-500/10' : 'hover:bg-white/5'}`}>
                       <td className="p-4 text-center">
                         <button onClick={() => handleSelectOne(pId)} className="text-gray-500 hover:text-white transition-colors flex justify-center w-full">
-                          {isSelected ? <CheckSquare size={20} className="text-cairo-orange"/> : <Square size={20}/>}
+                          {isSelected ? <CheckSquare size={20} className="text-orange-500"/> : <Square size={20}/>}
                         </button>
                       </td>
                       <td className="p-4">
-                        <div className="h-12 w-12 rounded-lg bg-gray-800 flex items-center justify-center overflow-hidden border border-white/10 group-hover:border-cairo-orange/30 transition-colors mx-auto">
+                        <div className="h-12 w-12 rounded-lg bg-gray-800 flex items-center justify-center overflow-hidden border border-white/10 group-hover:border-orange-500/30 transition-colors mx-auto">
                           {product.imagenUrl ? <img src={product.imagenUrl} alt="" className="w-full h-full object-cover"/> : <Package size={24} className="text-gray-600" />}
                         </div>
                       </td>
                       <td className="p-4">
-                        <span className="font-mono text-xs text-cairo-orange bg-cairo-orange/10 px-2 py-1 rounded border border-cairo-orange/20 inline-block">
+                        <span className="font-mono text-xs text-orange-500 bg-orange-500/10 px-2 py-1 rounded border border-orange-500/20 inline-block">
                           {product.codigo}
                         </span>
                       </td>
@@ -359,7 +361,7 @@ const ProductsView = () => {
                           <span className="text-xs font-bold text-white bg-white/10 px-2 py-0.5 rounded w-fit mt-1">{pTalle}</span>
                         </div>
                       </td>
-                      <td className="p-4 font-brand text-xl text-white tracking-wide">${pPrecio.toLocaleString()}</td>
+                      <td className="p-4 font-bold text-xl text-white tracking-wide">${pPrecio.toLocaleString()}</td>
                       <td className="p-4 text-center">
                         <span className={`px-2 py-1 rounded text-[10px] font-bold border uppercase inline-block
                           ${pStock <= 2 ? 'bg-red-500/10 text-red-400 border-red-500/20' : pStock < 10 ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' : 'bg-green-500/10 text-green-400 border-green-500/20'}`}>
@@ -368,7 +370,7 @@ const ProductsView = () => {
                       </td>
                       <td className="p-4 text-center">
                         <div className="flex justify-center gap-2">
-                          <button className="p-2 rounded-lg hover:bg-cairo-orange/10 hover:text-cairo-orange text-gray-400 transition-colors"><Edit size={18} /></button>
+                          <button className="p-2 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 text-gray-400 transition-colors"><Edit size={18} /></button>
                         </div>
                       </td>
                     </tr>
@@ -385,15 +387,15 @@ const ProductsView = () => {
 
       <AnimatePresence>
         {selectedIds.length > 0 && (
-          <motion.div initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }} className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 glass-panel bg-cairo-dark/90 backdrop-blur-xl border border-cairo-red/30 px-6 py-3 rounded-full shadow-2xl flex items-center gap-6">
+          <motion.div initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }} className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-[#111]/90 backdrop-blur-xl border border-red-500/30 px-6 py-3 rounded-full shadow-2xl flex items-center gap-6">
             <div className="flex items-center gap-3">
-              <div className="bg-cairo-orange text-white text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full">{selectedIds.length}</div>
+              <div className="bg-orange-500 text-white text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full">{selectedIds.length}</div>
               <span className="text-sm font-medium text-white">seleccionados</span>
             </div>
             <div className="h-6 w-px bg-white/10"></div>
             <div className="flex items-center gap-2">
               <button onClick={() => setSelectedIds([])} className="text-gray-400 hover:text-white text-xs font-bold uppercase transition-colors px-2">Cancelar</button>
-              <button onClick={handleDeleteSelected} className="flex items-center gap-2 bg-cairo-red hover:bg-red-600 text-white text-xs font-bold uppercase px-4 py-2 rounded-full transition-colors shadow-lg shadow-cairo-red/20"><Trash2 size={14} /> Eliminar</button>
+              <button onClick={handleDeleteSelected} className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white text-xs font-bold uppercase px-4 py-2 rounded-full transition-colors shadow-lg shadow-red-500/20"><Trash2 size={14} /> Eliminar</button>
             </div>
           </motion.div>
         )}
@@ -419,21 +421,21 @@ const ConfigView = () => {
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
       <div className="flex justify-between items-center mb-8">
         <div><h2 className="text-4xl font-brand text-white">Configuración</h2><p className="text-gray-400 text-sm">Ajustes generales de la tienda y el sistema.</p></div>
-        <button onClick={handleSave} className="btn-fire flex items-center gap-2 text-sm px-8 py-3 shadow-lg shadow-cairo-orange/20" disabled={loadingSave}>
+        <button onClick={handleSave} className="bg-orange-500 hover:bg-orange-600 font-bold flex items-center gap-2 text-sm px-8 py-3 rounded-lg shadow-lg shadow-orange-500/20 transition-all" disabled={loadingSave}>
           {loadingSave ? <RefreshCw className="animate-spin" size={18}/> : <Save size={18}/>} {loadingSave ? 'Guardando...' : 'Guardar Cambios'}
         </button>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="glass-panel p-6 rounded-2xl border border-white/10">
-          <h3 className="font-brand text-2xl text-white mb-6 flex items-center gap-2"><Store size={22} className="text-cairo-yellow"/> Perfil de Tienda</h3>
+        <div className="bg-white/5 p-6 rounded-2xl border border-white/10">
+          <h3 className="font-brand text-2xl text-white mb-6 flex items-center gap-2"><Store size={22} className="text-yellow-400"/> Perfil de Tienda</h3>
           <div className="space-y-4">
-            <div><label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Nombre de la Tienda</label><input type="text" defaultValue="El Cairo Bicicletas" className="w-full bg-black/20 border border-white/10 rounded-xl p-3 text-white focus:border-cairo-orange outline-none transition-colors"/></div>
+            <div><label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Nombre de la Tienda</label><input type="text" defaultValue="El Cairo Bicicletas" className="w-full bg-black/20 border border-white/10 rounded-xl p-3 text-white focus:border-orange-500 outline-none transition-colors"/></div>
           </div>
         </div>
-        <div className="glass-panel p-6 rounded-2xl border border-white/10">
-          <h3 className="font-brand text-2xl text-white mb-6 flex items-center gap-2"><Truck size={22} className="text-cairo-orange"/> Logística</h3>
+        <div className="bg-white/5 p-6 rounded-2xl border border-white/10">
+          <h3 className="font-brand text-2xl text-white mb-6 flex items-center gap-2"><Truck size={22} className="text-orange-500"/> Logística</h3>
           <div className="grid grid-cols-2 gap-4">
-            <div><label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Costo Envío</label><input type="number" defaultValue="5000" className="w-full bg-black/20 border border-white/10 rounded-xl p-3 text-white focus:border-cairo-orange outline-none"/></div>
+            <div><label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Costo Envío</label><input type="number" defaultValue="5000" className="w-full bg-black/20 border border-white/10 rounded-xl p-3 text-white focus:border-orange-500 outline-none"/></div>
           </div>
         </div>
       </div>
@@ -441,21 +443,29 @@ const ConfigView = () => {
   );
 };
 
-// --- COMPONENTE: MODAL DE CREACIÓN (Con Cloudinary) ---
+// --- COMPONENTE: MODAL DE CREACIÓN (COMPLETO Y CORREGIDO) ---
 const CreateProductModal = ({ isOpen, onClose, onSave }) => {
+  // 1. ESTADOS PRINCIPALES
   const [type, setType] = useState('Bicicleta');
   const [loading, setLoading] = useState(false);
-  const [images, setImages] = useState([]); 
   const [formData, setFormData] = useState({
     codigo: '', descripcion: '', precioPublico: '', stock: '', imagenUrl: '',
     rodado: '', velocidades: '', marca: '', color: '', 
     categoria: '', compatibilidad: '', 
-    talle: '', genero: '', tipoPrenda: '' 
+    talle: '', genero: '', tipoPrenda: '', frenos: ''
   });
   const [touched, setTouched] = useState({});
 
+  // 2. ESTADOS PARA IMAGEN (Cloudinary)
+  const [imageFile, setImageFile] = useState(null);
+  const [preview, setPreview] = useState("");
+  
+  const CLOUD_NAME = 'dawjsvwjo'; 
+  const UPLOAD_PRESET = 'bicicleteria_preset'; 
+
   if (!isOpen) return null;
 
+  // --- MANEJADORES ---
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -464,110 +474,110 @@ const CreateProductModal = ({ isOpen, onClose, onSave }) => {
   const handleBlur = (e) => {
     const { name, value } = e.target;
     setTouched(prev => ({ ...prev, [name]: true }));
-    if (value && ['descripcion', 'marca', 'color', 'categoria', 'tipoPrenda', 'genero', 'compatibilidad'].includes(name)) {
-      const formatted = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
-      setFormData(prev => ({ ...prev, [name]: formatted }));
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setPreview(URL.createObjectURL(file));
     }
   };
 
-  // --- SUBIDA A CLOUDINARY (fetch sin Authorization) ---
-const handleFileChange = async (e) => {
-  const files = e.target.files;
+  const uploadToCloudinary = async () => {
+    if (!imageFile) return ""; 
 
-  if (!files || files.length === 0) {
-    console.warn("No se seleccionó ninguna imagen.");
-    return; // ⚠ Evita crasheo
-  }
+    const data = new FormData();
+    data.append("file", imageFile);
+    data.append("upload_preset", UPLOAD_PRESET);
 
-  const file = files[0];
-
-  // Validar que sea imagen
-  if (!file.type.startsWith("image/")) {
-    alert("Solo se permiten imágenes.");
-    return;
-  }
-
-  // Generar preview seguro
-  try {
-    const previewUrl = URL.createObjectURL(file);
-
-    setImages([{ file, preview: previewUrl }]);
-
-    // Liberar memoria cuando la imagen ya no se necesite
-    return () => URL.revokeObjectURL(previewUrl);
-  } catch (err) {
-    console.error("Error creando preview:", err);
-    return;
-  }
-
-
-  // --- SUBIDA CLOUDINARY ---
-  const formDataUpload = new FormData();
-  formDataUpload.append("file", file);
-  formDataUpload.append("upload_preset", UPLOAD_PRESET);
-
-  try {
-    const response = await fetch(
-      `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-      { method: "POST", body: formDataUpload }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) throw new Error(data.error?.message);
-
-    setFormData((prev) => ({ ...prev, imagenUrl: data.secure_url }));
-  } catch (error) {
-    console.error("Error subiendo a Cloudinary:", error);
-    alert("Error subiendo imagen: " + error.message);
-    setImages([]);
-  }
-};
-
-
-  const removeImage = (index) => {
-    setImages(prev => prev.filter((_, i) => i !== index));
-    if (images.length === 1) setFormData(prev => ({ ...prev, imagenUrl: '' }));
+    try {
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+        method: "POST",
+        body: data
+      });
+      const fileData = await res.json();
+      return fileData.secure_url;
+    } catch (error) {
+      console.error("Error subiendo imagen:", error);
+      alert("Error al subir la imagen a la nube.");
+      throw error;
+    }
   };
 
+  // Guardar (Submit)
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validar campos básicos
     if (!formData.codigo || !formData.descripcion || !formData.precioPublico || !formData.stock) {
-      alert("Por favor completa los campos obligatorios.");
+      alert("Por favor completa los campos obligatorios (*)");
       setTouched({ codigo: true, descripcion: true, precioPublico: true, stock: true });
       return;
     }
-    setLoading(true);
-    
-    let endpoint = '';
-    let payload = {
-      codigo: formData.codigo,
-      descripcion: formData.descripcion,
-      precioPublico: Number(formData.precioPublico),
-      precioCosto: Number(formData.precioPublico) * 0.7, 
-      stock: Number(formData.stock),
-      ImagenUrl: formData.imagenUrl || (images.length > 0 ? "https://placehold.co/400" : ""),
-      moneda: 'ARS',
-      activo: true
-    };
 
-    if (type === 'Bicicleta') {
-      endpoint = '/Bicicletas';
-      payload = { ...payload,imagenUrl: formData.imagenUrl, rodado: formData.rodado, velocidades: formData.velocidades, marca: formData.marca, color: formData.color, frenos: 'V-Brake' };
-    } else if (type === 'Repuesto') {
-      endpoint = '/Repuestos';
-      payload = { ...payload, imagenUrl: formData.imagenUrl, categoria: formData.categoria, compatibilidad: formData.compatibilidad, marcaComponente: formData.marca };
-    } else {
-      endpoint = '/Indumentaria';
-      payload = { ...payload, imagenUrl: formData.imagenUrl, talle: formData.talle, color: formData.color, genero: formData.genero, tipoPrenda: formData.tipoPrenda };
-    }
+    setLoading(true);
 
     try {
+      // 1. Subir imagen (si existe)
+      let finalUrl = formData.imagenUrl;
+      if (imageFile) {
+        finalUrl = await uploadToCloudinary();
+      }
+
+      // 2. Preparar Payload (Convertir números y asignar URL)
+      const payload = {
+        Codigo: formData.codigo,
+        Descripcion: formData.descripcion,
+        PrecioPublico: Number(formData.precioPublico),
+        PrecioCosto: Number(formData.precioPublico) * 0.7, // Calculado automático
+        Stock: Number(formData.stock),
+        ImagenUrl: finalUrl,
+        Activo: true,
+        Moneda: 'ARS'
+      };
+
+      // 3. Agregar campos específicos según el tipo
+      let endpoint = '';
+      if (type === 'Bicicleta') {
+        endpoint = '/Bicicletas';
+        Object.assign(payload, { 
+           Rodado: formData.rodado, 
+           Velocidades: formData.velocidades, 
+           Marca: formData.marca, 
+           Color: formData.color,
+           Frenos: formData.frenos || 'V-Brake'
+        });
+      } else if (type === 'Repuesto') {
+        endpoint = '/Repuestos';
+        Object.assign(payload, { 
+           Categoria: formData.categoria, 
+           Compatibilidad: formData.compatibilidad, 
+           MarcaComponente: formData.marca 
+        });
+      } else {
+        endpoint = '/Indumentaria';
+        Object.assign(payload, { 
+           Talle: formData.talle, 
+           Color: formData.color, 
+           Genero: formData.genero, 
+           TipoPrenda: formData.tipoPrenda 
+        });
+      }
+
+      // 4. Enviar al Backend
       const token = localStorage.getItem('token'); 
-      await axios.post(`${BASE_URL}${endpoint}`, payload, { headers: { Authorization: `Bearer ${token}` } });
-      onSave(); onClose(); alert("¡Producto creado exitosamente!");
+      await axios.post(`${BASE_URL}${endpoint}`, payload, { 
+        headers: { Authorization: `Bearer ${token}` } 
+      });
+
+      alert("¡Producto creado exitosamente!");
+      onSave(); // Recargar lista en el padre
+      onClose(); // Cerrar modal
+
     } catch (error) {
-      console.error(error); alert("Error al crear: " + (error.response?.data?.title || error.message));
+      console.error(error);
+      alert("Error al crear: " + (error.response?.data?.message || error.message));
     } finally {
       setLoading(false);
     }
@@ -575,77 +585,105 @@ const handleFileChange = async (e) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="glass-panel w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 p-0 shadow-2xl relative bg-[#0f0f0f]">
+      <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-[#0f0f0f] w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 p-0 shadow-2xl relative">
+        
+        {/* Header Modal */}
         <div className="sticky top-0 z-10 bg-black/50 backdrop-blur-xl border-b border-white/10 p-6 flex justify-between items-center">
-          <h2 className="text-2xl font-brand text-white flex items-center gap-2"><Plus className="text-cairo-orange"/> Nuevo Producto</h2>
+          <h2 className="text-2xl font-brand text-white flex items-center gap-2"><Plus className="text-orange-500"/> Nuevo Producto</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-full"><X size={24}/></button>
         </div>
+
         <form onSubmit={handleSubmit} className="p-8 space-y-8">
+          
+          {/* Selector de TIPO */}
           <div className="flex p-1 bg-white/5 rounded-xl border border-white/10">
             {['Bicicleta', 'Repuesto', 'Indumentaria'].map(t => (
-              <label key={t} className={`flex-1 cursor-pointer text-center py-2.5 rounded-lg transition-all font-bold text-sm ${type === t ? 'bg-cairo-orange text-white shadow-lg shadow-cairo-orange/20' : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'}`}>
+              <label key={t} className={`flex-1 cursor-pointer text-center py-2.5 rounded-lg transition-all font-bold text-sm ${type === t ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20' : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'}`}>
                 <input type="radio" name="type" value={t} checked={type === t} onChange={() => setType(t)} className="hidden"/>{t}
               </label>
             ))}
           </div>
+
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+            
+            {/* COLUMNA IZQUIERDA: IMAGEN */}
             <div className="md:col-span-4 space-y-4">
-              <label className="block text-xs font-bold text-gray-500 uppercase">Imágenes del Producto</label>
+              <label className="block text-xs font-bold text-gray-500 uppercase">Imagen del Producto</label>
+              
+              {/* Área de carga */}
               <div className="relative group">
-                <input type="file" multiple accept="image/*" onChange={handleFileChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"/>
-                <div className="border-2 border-dashed border-white/10 rounded-xl p-6 flex flex-col items-center justify-center text-center group-hover:border-cairo-orange/50 group-hover:bg-white/5 transition-all min-h-[160px]">
-                  <div className="bg-white/5 p-3 rounded-full mb-3 group-hover:scale-110 transition-transform"><Upload size={24} className="text-cairo-orange"/></div>
-                  <p className="text-sm text-gray-300 font-medium">Click o arrastra aquí</p>
+                <input type="file" accept="image/*" onChange={handleFileChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"/>
+                
+                <div className="border-2 border-dashed border-white/10 rounded-xl p-6 flex flex-col items-center justify-center text-center group-hover:border-orange-500/50 group-hover:bg-white/5 transition-all min-h-40 overflow-hidden relative">
+                   {preview ? (
+                     <img src={preview} alt="Vista previa" className="absolute inset-0 w-full h-full object-cover" />
+                   ) : (
+                     <>
+                       <div className="bg-white/5 p-3 rounded-full mb-3 group-hover:scale-110 transition-transform"><Upload size={24} className="text-orange-500"/></div>
+                       <p className="text-sm text-gray-300 font-medium">Click para subir imagen</p>
+                     </>
+                   )}
                 </div>
               </div>
-              {images.length > 0 && (
-                <div className="grid grid-cols-3 gap-2">
-                  {images.map((img, idx) => (
-                    <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-white/10 group">
-                      <img src={img.preview} alt="preview" className="w-full h-full object-cover"/>
-                      <button type="button" onClick={() => removeImage(idx)} className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-cairo-red"><Trash2 size={16}/></button>
-                    </div>
-                  ))}
-                </div>
+
+              {/* Botón para quitar imagen */}
+              {preview && (
+                <button type="button" onClick={() => { setImageFile(null); setPreview(""); }} className="text-xs text-red-400 flex items-center gap-1 hover:underline">
+                  <Trash2 size={12}/> Quitar imagen
+                </button>
               )}
-              <div className="relative"><div className="absolute inset-y-0 left-3 flex items-center pointer-events-none"><ImageIcon size={14} className="text-gray-600"/></div><input name="imagenUrl" placeholder="O pega una URL externa..." value={formData.imagenUrl} onChange={handleChange} className="w-full bg-black/20 border border-white/10 rounded-lg py-2 pl-9 pr-3 text-xs text-white focus:border-cairo-orange focus:outline-none placeholder-gray-700"/></div>
+
+              {/* Input URL opcional */}
+              <div className="relative">
+                 <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none"><ImageIcon size={14} className="text-gray-600"/></div>
+                 <input name="imagenUrl" placeholder="O pega URL externa..." value={formData.imagenUrl} onChange={handleChange} className="w-full bg-black/20 border border-white/10 rounded-lg py-2 pl-9 pr-3 text-xs text-white focus:border-orange-500 focus:outline-none placeholder-gray-700"/>
+              </div>
             </div>
+
+            {/* COLUMNA DERECHA: CAMPOS */}
             <div className="md:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input name="codigo" label="Código (SKU)" value={formData.codigo} onChange={handleChange} onBlur={handleBlur} required error={touched.codigo && !formData.codigo} />
               <div className="md:col-span-2"><Input name="descripcion" label="Nombre / Descripción" value={formData.descripcion} onChange={handleChange} onBlur={handleBlur} required error={touched.descripcion && !formData.descripcion} /></div>
               <Input name="precioPublico" label="Precio Venta ($)" type="number" value={formData.precioPublico} onChange={handleChange} required error={touched.precioPublico && !formData.precioPublico} />
               <Input name="stock" label="Stock Inicial" type="number" value={formData.stock} onChange={handleChange} required error={touched.stock && !formData.stock} />
+              
               <div className="col-span-2 h-px bg-white/10 my-2"></div>
+
+              {/* CAMPOS CONDICIONALES */}
               <AnimatePresence mode='wait'>
                 {type === 'Bicicleta' && (
                   <motion.div key="bici" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="col-span-2 grid grid-cols-2 gap-4">
-                    <Input name="marca" label="Marca" value={formData.marca} onChange={handleChange} onBlur={handleBlur} />
-                    <Input name="rodado" label="Rodado (ej: 29)" value={formData.rodado} onChange={handleChange} />
-                    <Input name="color" label="Color" value={formData.color} onChange={handleChange} onBlur={handleBlur} />
+                    <Input name="marca" label="Marca" value={formData.marca} onChange={handleChange} />
+                    <Input name="rodado" label="Rodado" value={formData.rodado} onChange={handleChange} />
                     <Input name="velocidades" label="Velocidades" value={formData.velocidades} onChange={handleChange} />
+                    <Input name="color" label="Color" value={formData.color} onChange={handleChange} />
                   </motion.div>
                 )}
                 {type === 'Repuesto' && (
                   <motion.div key="rep" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="col-span-2 grid grid-cols-2 gap-4">
-                    <Input name="categoria" label="Categoría" value={formData.categoria} onChange={handleChange} onBlur={handleBlur} />
-                    <Input name="compatibilidad" label="Compatibilidad" value={formData.compatibilidad} onChange={handleChange} onBlur={handleBlur} />
-                    <Input name="marca" label="Marca Componente" value={formData.marca} onChange={handleChange} onBlur={handleBlur} />
+                    <Input name="categoria" label="Categoría" value={formData.categoria} onChange={handleChange} />
+                    <Input name="compatibilidad" label="Compatibilidad" value={formData.compatibilidad} onChange={handleChange} />
+                    <Input name="marca" label="Marca Componente" value={formData.marca} onChange={handleChange} />
                   </motion.div>
                 )}
                 {type === 'Indumentaria' && (
                   <motion.div key="ind" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="col-span-2 grid grid-cols-2 gap-4">
-                    <Input name="tipoPrenda" label="Tipo de Prenda" value={formData.tipoPrenda} onChange={handleChange} onBlur={handleBlur} />
+                    <Input name="tipoPrenda" label="Tipo de Prenda" value={formData.tipoPrenda} onChange={handleChange} />
                     <Input name="talle" label="Talle" value={formData.talle} onChange={handleChange} />
-                    <Input name="genero" label="Género" value={formData.genero} onChange={handleChange} onBlur={handleBlur} />
-                    <Input name="color" label="Color" value={formData.color} onChange={handleChange} onBlur={handleBlur} />
+                    <Input name="genero" label="Género" value={formData.genero} onChange={handleChange} />
+                    <Input name="color" label="Color" value={formData.color} onChange={handleChange} />
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
           </div>
+
           <div className="pt-6 flex justify-end gap-3 border-t border-white/10">
             <button type="button" onClick={onClose} className="px-6 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-colors font-medium text-sm">Cancelar</button>
-            <button type="submit" disabled={loading} className="btn-fire px-8 py-2.5 text-sm shadow-lg shadow-cairo-orange/20 flex items-center gap-2">{loading ? <Loader className="animate-spin" size={18}/> : <Save size={18}/>} {loading ? 'Guardando...' : 'Guardar Producto'}</button>
+            <button type="submit" disabled={loading} className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-2.5 text-sm shadow-lg shadow-orange-500/20 flex items-center gap-2 rounded-xl transition-all">
+              {loading ? <Loader className="animate-spin" size={18}/> : <Save size={18}/>} 
+              {loading ? 'Guardando...' : 'Guardar Producto'}
+            </button>
           </div>
         </form>
       </motion.div>
@@ -656,26 +694,26 @@ const handleFileChange = async (e) => {
 // --- HELPER INPUT ---
 const Input = ({ label, error, type = "text", ...props }) => (
   <div className="w-full">
-    <label className={`block text-xs font-bold uppercase mb-1.5 transition-colors ${error ? 'text-cairo-red' : 'text-gray-500'}`}>{label} {props.required && <span className="text-cairo-orange">*</span>}</label>
-    <input type={type} {...props} className={`w-full bg-black/40 border rounded-xl px-4 py-3 text-white text-sm transition-all focus:outline-none placeholder-gray-700 ${error ? 'border-cairo-red focus:border-cairo-red bg-cairo-red/5' : 'border-white/10 focus:border-cairo-orange focus:bg-black/60'} ${type === 'number' ? '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none' : ''}`} />
-    {error && <p className="text-[10px] text-cairo-red mt-1 font-medium">Requerido</p>}
+    <label className={`block text-xs font-bold uppercase mb-1.5 transition-colors ${error ? 'text-red-400' : 'text-gray-500'}`}>{label} {props.required && <span className="text-orange-500">*</span>}</label>
+    <input type={type} {...props} className={`w-full bg-black/40 border rounded-xl px-4 py-3 text-white text-sm transition-all focus:outline-none placeholder-gray-700 ${error ? 'border-red-400 focus:border-red-400 bg-red-400/5' : 'border-white/10 focus:border-orange-500 focus:bg-black/60'} ${type === 'number' ? '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none' : ''}`} />
+    {error && <p className="text-[10px] text-red-400 mt-1 font-medium">Requerido</p>}
   </div>
 );
 
 // --- OTROS AUXILIARES ---
 const SidebarItem = ({ icon, label, active, onClick }) => (
-  <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group ${active ? 'bg-cairo-orange text-white shadow-lg shadow-cairo-orange/20 font-bold' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}>
-    <span className={`${active ? 'text-white' : 'text-gray-500 group-hover:text-cairo-yellow'} transition-colors`}>{icon}</span><span className="text-sm">{label}</span>
+  <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group ${active ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20 font-bold' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}>
+    <span className={`${active ? 'text-white' : 'text-gray-500 group-hover:text-yellow-400'} transition-colors`}>{icon}</span><span className="text-sm">{label}</span>
   </button>
 );
 const StatCard = ({ title, value, icon, color }) => (
-  <div className="glass-panel p-6 rounded-2xl border border-white/10 flex items-center gap-4">
+  <div className="bg-white/5 p-6 rounded-2xl border border-white/10 flex items-center gap-4">
     <div className={`p-3 rounded-xl bg-white/5 ${color}`}>{icon}</div><div><p className="text-xs text-gray-400 font-bold uppercase tracking-wider">{title}</p><p className="text-2xl font-brand text-white">{value}</p></div>
   </div>
 );
 const PlaceholderView = ({ title, desc, icon }) => (
   <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center h-[60vh] text-center border-2 border-dashed border-white/10 rounded-3xl bg-white/5">
-    <div className="p-6 bg-cairo-dark rounded-full mb-4 text-cairo-orange shadow-lg shadow-cairo-orange/10">{icon}</div><h2 className="text-4xl font-brand text-white mb-2">{title}</h2><p className="text-gray-400 max-w-md">{desc}</p>
+    <div className="p-6 bg-cairo-dark rounded-full mb-4 text-orange-500 shadow-lg shadow-orange-500/10">{icon}</div><h2 className="text-4xl font-brand text-white mb-2">{title}</h2><p className="text-gray-400 max-w-md">{desc}</p>
   </motion.div>
 );
 

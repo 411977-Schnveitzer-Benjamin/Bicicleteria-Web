@@ -4,15 +4,15 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
-// --- ESTOS SON LOS QUE FALTAN ---
+using System.Text.Json.Serialization;
 using Bicicleteria.API.Repositories;
-using Bicicleteria.API.Interfaces; // O Bicicleteria.API.Repositories.Interfaces si lo pusiste ahí
-// --------------------------------
+using Bicicleteria.API.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // 1. SERVICIOS
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(x =>
+   x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddEndpointsApiExplorer();
 
 // Configurar Swagger

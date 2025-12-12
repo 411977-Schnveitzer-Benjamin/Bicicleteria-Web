@@ -54,7 +54,7 @@ const Home = () => {
         >
           <h1 className="text-7xl md:text-9xl font-brand leading-none mb-6">
             <span className="text-white">ROMPÉ TUS</span> <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cairo-red via-cairo-orange to-cairo-yellow animate-shine bg-[length:200%_auto]">
+            <span className="text-transparent bg-clip-text bg-linear-to-r from-cairo-red via-cairo-orange to-cairo-yellow animate-shine bg-size-[200%_auto]">
               LÍMITES
             </span>
           </h1>
@@ -82,7 +82,7 @@ const Home = () => {
         className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-24"
       >
         <div className="md:col-span-2 glass-panel rounded-3xl p-8 min-h-[300px] relative overflow-hidden group cursor-pointer hover:border-cairo-orange/50 transition-colors">
-          <div className="absolute inset-0 bg-gradient-to-br from-cairo-red/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute inset-0 bg-linear-to-br from-cairo-red/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
           <h3 className="text-4xl font-brand text-white relative z-10">Bicicletas de Montaña</h3>
           <p className="text-gray-400 mt-2 relative z-10">Conquistá cualquier terreno con nuestra serie Pro.</p>
           <div className="absolute bottom-4 right-4 bg-cairo-red p-3 rounded-full text-white transform translate-y-10 group-hover:translate-y-0 transition-transform">
@@ -117,7 +117,7 @@ const Home = () => {
 
       {/* MARQUEE */}
       <div className="overflow-hidden py-10 border-y border-white/5 mb-20 bg-cairo-dark/50">
-         <div className="whitespace-nowrap animate-[marquee_20s_linear_infinite] flex gap-10">
+         <div className="whitespace-nowrap animate-marquee flex gap-10">
             {[...Array(10)].map((_, i) => (
               <span key={i} className="text-6xl font-brand text-white/10 mx-8">
                 EL CAIRO • RIDE YOUR WAY •
