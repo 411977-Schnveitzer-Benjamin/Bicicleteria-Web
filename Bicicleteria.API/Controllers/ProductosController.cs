@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Bicicleteria.API.Models;
+using System.Text.Json; // <--- Necesario para la configuración manual
+using System.Text.Json.Serialization; // <--- Necesario para IgnoreCycles
 
 namespace Bicicleteria.API.Controllers
 {
@@ -16,13 +18,13 @@ namespace Bicicleteria.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<object>>> GetAll()
+        public async Task<ActionResult> GetAll()
         {
             try
             {
                 var listaUnificada = new List<object>();
 
-                // 1. BICICLETAS (Seguro)
+                // 1. BICICLETAS
                 var bicis = await _context.Bicicletas
                     .AsNoTracking()
                     .Where(b => b.Activo == true)
@@ -39,9 +41,9 @@ namespace Bicicleteria.API.Controllers
                         talle = b.Rodado,
                         tipo = "Bicicleta"
                     })
-                    .ToListAsync(); // El ToList va AL FINAL
+                    .ToListAsync();
 
-                // 2. REPUESTOS (Seguro)
+                // 2. REPUESTOS
                 var repuestos = await _context.Repuestos
                     .AsNoTracking()
                     .Where(r => r.Activo == true)
@@ -58,13 +60,13 @@ namespace Bicicleteria.API.Controllers
                         talle = "-",
                         tipo = "Repuesto"
                     })
-                    .ToListAsync(); // El ToList va AL FINAL
+                    .ToListAsync();
 
-                // 3. INDUMENTARIA (Aquí estaba el error)
+                // 3. INDUMENTARIA
                 var ropa = await _context.Indumentaria
                     .AsNoTracking()
                     .Where(i => i.Activo == true)
-                    .Select(i => new // <--- ¡EL SELECT VA AQUÍ!
+                    .Select(i => new
                     {
                         id = i.IndumentariaId,
                         indumentariaId = i.IndumentariaId,
@@ -74,22 +76,29 @@ namespace Bicicleteria.API.Controllers
                         stock = i.Stock,
                         imagenUrl = i.imagenUrl,
                         categoria = "Indumentaria",
-                        talle = i.Talle,
+                        talle = i.Talle, // Asegúrate que en la BD esto sea texto simple
                         tipo = "Indumentaria"
                     })
-                    .ToListAsync(); // <--- ¡AHORA SÍ, AL FINAL!
+                    .ToListAsync();
 
                 listaUnificada.AddRange(bicis);
                 listaUnificada.AddRange(repuestos);
                 listaUnificada.AddRange(ropa);
 
-                return Ok(listaUnificada);
+                // --- EL CAMBIO CLAVE ESTÁ AQUÍ ---
+                // Forzamos la configuración para ignorar ciclos AQUÍ MISMO.
+                // Esto anula cualquier error que pudiera haber en Program.cs
+                var opcionesSeguras = new JsonSerializerOptions
+                {
+                    ReferenceHandler = ReferenceHandler.IgnoreCycles,
+                    WriteIndented = true
+                };
+
+                return new JsonResult(listaUnificada, opcionesSeguras);
             }
             catch (Exception ex)
             {
-                // Si falla, al menos te dirá por qué en vez de cerrarse
-                Console.WriteLine($"ERROR CRITICO: {ex.Message}");
-                return BadRequest($"Error en servidor: {ex.Message}");
+                return BadRequest(new { mensaje = "Error crítico al obtener productos", error = ex.Message });
             }
         }
     }
