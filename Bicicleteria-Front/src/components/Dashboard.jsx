@@ -4,26 +4,24 @@ import {
   LayoutDashboard, Package, ShoppingCart, Users, LogOut, ArrowLeft, 
   Settings, DollarSign, Activity, AlertTriangle, Search, Filter, Plus, 
   ArrowUpDown, Edit, Trash2, X, CheckSquare, Square, Save, Store, 
-  Truck, Bell, Shield, RefreshCw, Loader, Upload, Image as ImageIcon 
+  Truck, Loader, Image as ImageIcon 
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext'; 
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// --- URL BASE (HTTPS) ---
-// Ajusta esto a tu URL real cuando subas a producción
-const BASE_URL = 'https://localhost:7222/api';
+// IMPORTAMOS EL UPLOADER
+import ImageUploader from '../components/ImageUploader';
 
-// --- CLOUDINARY CONFIG ---
-const CLOUD_NAME = 'dawjsvwjo';
-const UPLOAD_PRESET = 'bicicleteria_preset';
+// --- URL BASE ---
+const BASE_URL = 'https://localhost:7222/api';
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('estadisticas'); 
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  // Estado para Estadísticas
+  // Estados estadísticas
   const [statsData, setStatsData] = useState(null);
   const [statsLoading, setStatsLoading] = useState(true);
   const [statsError, setStatsError] = useState(null);
@@ -34,8 +32,10 @@ const Dashboard = () => {
         const response = await axios.get(`${BASE_URL}/Dashboard`);
         setStatsData(response.data);
       } catch (err) {
-        if (err.response?.status === 401) setStatsError("Sesión expirada.");
-        else setStatsError("No se pudo conectar con el servidor.");
+        if (err.response?.status !== 404) {
+           if (err.response?.status === 401) setStatsError("Sesión expirada.");
+           else setStatsError("No se pudo conectar con el servidor.");
+        }
       } finally {
         setStatsLoading(false);
       }
@@ -48,11 +48,11 @@ const Dashboard = () => {
     navigate('/login');
   };
 
-  const displayName = user?.Nombre || user?.unique_name || "Usuario";
-  const displayEmail = user?.unique_name || user?.email || "sin-email@elcairo.com";
+  const displayName = user?.Nombre || "Administrador";
+  const displayEmail = user?.unique_name || "admin@elcairo.com";
 
   return (
-    <div className="flex h-screen bg-cairo-dark overflow-hidden">
+    <div className="flex h-screen bg-[#0a0a0a] overflow-hidden font-sans text-gray-100">
       
       {/* --- SIDEBAR --- */}
       <aside className="w-64 bg-black/40 border-r border-white/10 flex flex-col justify-between p-6 relative z-20 backdrop-blur-xl">
@@ -72,13 +72,13 @@ const Dashboard = () => {
         </div>
 
         <div className="pt-6 border-t border-white/10 mt-auto">
-          <div className="flex items-center gap-3 p-2 rounded-xl bg-white/5 border border-white/5 hover:border-cairo-orange/30 transition-colors group">
+          <div className="flex items-center gap-3 p-2 rounded-xl bg-white/5 border border-white/5 hover:border-orange-500/30 transition-colors group">
              <div className="h-10 w-10 min-w-10 rounded-full bg-orange-500/20 border border-orange-500/50 flex items-center justify-center text-orange-500 font-bold shadow-sm group-hover:scale-105 transition-transform">
                 {displayName.charAt(0).toUpperCase()}
              </div>
              <div className="flex-1 overflow-hidden">
-               <p className="text-xs font-bold text-white truncate" title={displayName}>{displayName}</p>
-               <p className="text-[10px] text-gray-400 font-medium truncate group-hover:text-gray-300 transition-colors" title={displayEmail}>{displayEmail}</p>
+               <p className="text-xs font-bold text-white truncate">{displayName}</p>
+               <p className="text-[10px] text-gray-400 font-medium truncate group-hover:text-gray-300 transition-colors">{displayEmail}</p>
              </div>
              <button onClick={handleLogout} className="p-2 text-gray-500 hover:text-red-500 hover:bg-white/10 rounded-lg transition-all" title="Cerrar Sesión">
                 <LogOut size={18}/>
@@ -89,7 +89,6 @@ const Dashboard = () => {
 
       {/* --- AREA PRINCIPAL --- */}
       <main className="flex-1 overflow-y-auto relative p-8">
-        {/* Fondos decorativos */}
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-red-500/5 rounded-full blur-[120px] -z-10" />
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-yellow-500/5 rounded-full blur-[120px] -z-10" />
 
@@ -102,8 +101,6 @@ const Dashboard = () => {
               
               {statsLoading ? (
                  <div className="flex items-center gap-2 text-white"><Loader className="animate-spin"/> Cargando datos...</div>
-              ) : statsError ? (
-                 <div className="text-red-400 p-4 border border-red-500/20 rounded-lg bg-red-500/5">{statsError}</div>
               ) : (
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -111,7 +108,7 @@ const Dashboard = () => {
                     <StatCard title="Pedidos" value={statsData?.cantidadVentasMes || 0} icon={<ShoppingCart/>} color="text-yellow-400" />
                     <StatCard title="Clientes Nuevos" value={statsData?.clientesNuevosMes || 0} icon={<Users/>} color="text-orange-400" />
                   </div>
-
+                  
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <div className="bg-white/5 p-6 rounded-2xl border border-white/10">
                       <h3 className="font-bold text-2xl text-white mb-4 flex items-center gap-2">
@@ -126,36 +123,21 @@ const Dashboard = () => {
                         ))}
                       </div>
                     </div>
-
-                    <div className="bg-white/5 p-6 rounded-2xl border border-red-500/20 relative overflow-hidden">
-                      <h3 className="font-bold text-2xl text-red-400 mb-4 flex items-center gap-2">
-                        <AlertTriangle size={20}/> Alertas de Stock
-                      </h3>
-                      <div className="space-y-3">
-                        {statsData?.productosBajoStock?.map((p, i) => (
-                          <div key={i} className="flex justify-between items-center p-3 bg-black/20 border border-white/5 rounded-lg">
-                            <div><p className="text-sm font-bold text-gray-200">{p.descripcion}</p><p className="text-[10px] font-bold text-orange-400 uppercase">{p.tipo} • {p.codigo}</p></div>
-                            <div className="px-3 py-1 bg-red-500/10 border border-red-500/20 rounded text-red-400 font-bold">{p.stock} <span className="text-[8px]">Unid.</span></div>
-                          </div>
-                        ))}
-                         {statsData?.productosBajoStock?.length === 0 && <p className="text-green-500 text-sm">¡Stock en orden!</p>}
-                      </div>
-                    </div>
                   </div>
                 </>
               )}
             </motion.div>
           )}
 
-          {/* 2. VISTA DE PRODUCTOS */}
+          {/* 2. VISTA DE PRODUCTOS (CON FILTROS RESTAURADOS) */}
           {activeTab === 'productos' && <ProductsView />}
 
           {/* 3. VISTA DE CONFIGURACIÓN */}
           {activeTab === 'config' && <ConfigView />}
 
           {/* PLACEHOLDERS */}
-          {activeTab === 'ordenes' && <PlaceholderView title="Ordenes de Venta" desc="Administra los pedidos, cambia estados y emite facturas." icon={<ShoppingCart size={48}/>} />}
-          {activeTab === 'usuarios' && <PlaceholderView title="Gestión de Usuarios" desc="Administra clientes, empleados y permisos." icon={<Users size={48}/>} />}
+          {activeTab === 'ordenes' && <PlaceholderView title="Ordenes de Venta" desc="Administra los pedidos." icon={<ShoppingCart size={48}/>} />}
+          {activeTab === 'usuarios' && <PlaceholderView title="Gestión de Usuarios" desc="Administra usuarios." icon={<Users size={48}/>} />}
 
         </div>
       </main>
@@ -170,6 +152,7 @@ const ProductsView = () => {
   const [error, setError] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
+  // ESTADOS DE FILTRO Y ORDENAMIENTO (RESTAURADOS)
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({ categoria: '', talle: '' });
   const [sortOrder, setSortOrder] = useState('az'); 
@@ -178,7 +161,7 @@ const ProductsView = () => {
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const response = await axios.get(`${BASE_URL}/Productos`);
+        const response = await axios.get(`${BASE_URL}/Bicicletas`); // Ajusta si tienes endpoint unificado
         setProducts(response.data);
       } catch (err) {
         console.error("Error cargando productos:", err);
@@ -190,6 +173,7 @@ const ProductsView = () => {
     loadProducts();
   }, []);
 
+  // LÓGICA DE FILTRADO (RESTAURADA)
   const filteredProducts = useMemo(() => {
     let result = [...products];
     if (searchTerm) {
@@ -199,7 +183,6 @@ const ProductsView = () => {
       );
     }
     if (filters.categoria) result = result.filter(p => p.categoria === filters.categoria);
-    if (filters.talle) result = result.filter(p => (p.talle || "").includes(filters.talle));
     
     result.sort((a, b) => {
       const nameA = a.descripcion || a.nombre || "";
@@ -231,7 +214,7 @@ const ProductsView = () => {
   const handleDeleteSelected = async () => {
     if(!window.confirm(`¿Seguro que quieres eliminar ${selectedIds.length} productos?`)) return;
     try {
-      alert(`Simulación: Eliminando IDs ${selectedIds.join(", ")}`);
+      // Aquí iría el DELETE real
       setProducts(products.filter(p => !selectedIds.includes(p.bicicletaId || p.repuestoId || p.id)));
       setSelectedIds([]);
     } catch (err) {
@@ -255,6 +238,7 @@ const ProductsView = () => {
         </button>
       </div>
 
+      {/* BARRA DE BÚSQUEDA Y FILTROS (RESTAURADA) */}
       <div className="bg-white/5 p-4 rounded-2xl mb-6 flex flex-col lg:flex-row gap-4 items-center justify-between border border-white/10">
         <div className="relative w-full lg:w-96 group">
           <Search className="absolute left-3 top-3 text-gray-500 group-focus-within:text-orange-500 transition-colors" size={20} />
@@ -267,6 +251,7 @@ const ProductsView = () => {
           />
         </div>
         <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+          {/* Filtro Categoría */}
           <div className="flex items-center gap-2 bg-black/40 border border-white/10 px-3 py-2.5 rounded-xl hover:border-white/20 transition-colors">
             <Filter size={16} className="text-yellow-400" />
             <select
@@ -274,12 +259,13 @@ const ProductsView = () => {
               value={filters.categoria}
               onChange={(e) => setFilters({ ...filters, categoria: e.target.value })}
             >
-              <option value="" className="bg-[#111]">Categoría</option>
+              <option value="" className="bg-[#111]">Todas Categorías</option>
               <option value="Bicicletas" className="bg-[#111]">Bicicletas</option>
               <option value="Repuestos" className="bg-[#111]">Repuestos</option>
               <option value="Indumentaria" className="bg-[#111]">Indumentaria</option>
             </select>
           </div>
+          {/* Ordenamiento */}
           <div className="flex items-center gap-2 bg-black/40 border border-white/10 px-3 py-2.5 rounded-xl hover:border-white/20 transition-colors">
             <ArrowUpDown size={16} className="text-orange-500" />
             <select
@@ -296,14 +282,15 @@ const ProductsView = () => {
         </div>
       </div>
 
+      {/* TABLA DE PRODUCTOS */}
       <div className="bg-white/5 rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
         {loading ? (
-           <div className="p-12 text-center text-white flex flex-col items-center">
+            <div className="p-12 text-center text-white flex flex-col items-center">
               <Loader className="animate-spin mb-2" size={32}/>
               <p>Cargando inventario...</p>
-           </div>
+            </div>
         ) : error ? (
-           <div className="p-12 text-center text-red-400">{error}</div>
+            <div className="p-12 text-center text-red-400">{error}</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-center border-collapse">
@@ -320,10 +307,9 @@ const ProductsView = () => {
                   <th className="p-4 text-center">Imagen</th>
                   <th className="p-4 text-center">Código</th>
                   <th className="p-4 text-center">Producto</th>
-                  <th className="p-4 text-center">Info</th>
                   <th className="p-4 text-center">Precio</th>
                   <th className="p-4 text-center">Stock</th>
-                  <th className="p-4 text-center">Editar</th>
+                  <th className="p-4 text-center">Acciones</th>
                 </tr>
               </thead>
 
@@ -334,8 +320,6 @@ const ProductsView = () => {
                   const pNombre = product.descripcion || product.nombre || "Sin Nombre";
                   const pPrecio = product.precioPublico || product.precio || 0;
                   const pStock = product.stock !== undefined ? product.stock : 0;
-                  const pCategoria = product.categoria || "General";
-                  const pTalle = product.talle || product.rodado || "-";
 
                   return (
                     <tr key={pId} className={`transition-colors group ${isSelected ? 'bg-orange-500/10' : 'hover:bg-white/5'}`}>
@@ -346,7 +330,12 @@ const ProductsView = () => {
                       </td>
                       <td className="p-4">
                         <div className="h-12 w-12 rounded-lg bg-gray-800 flex items-center justify-center overflow-hidden border border-white/10 group-hover:border-orange-500/30 transition-colors mx-auto">
-                          {product.imagenUrl ? <img src={product.imagenUrl} alt="" className="w-full h-full object-cover"/> : <Package size={24} className="text-gray-600" />}
+                           {/* LOGICA DE IMAGEN CLOUDINARY O NULL */}
+                           {product.imagenUrl ? (
+                            <img src={product.imagenUrl} alt="" className="w-full h-full object-cover"/> 
+                          ) : (
+                            <Package size={20} className="text-gray-600" />
+                          )}
                         </div>
                       </td>
                       <td className="p-4">
@@ -355,12 +344,6 @@ const ProductsView = () => {
                         </span>
                       </td>
                       <td className="p-4 font-bold text-white">{pNombre}</td>
-                      <td className="p-4">
-                        <div className="flex flex-col items-center">
-                          <span className="text-xs text-gray-400">{pCategoria}</span>
-                          <span className="text-xs font-bold text-white bg-white/10 px-2 py-0.5 rounded w-fit mt-1">{pTalle}</span>
-                        </div>
-                      </td>
                       <td className="p-4 font-bold text-xl text-white tracking-wide">${pPrecio.toLocaleString()}</td>
                       <td className="p-4 text-center">
                         <span className={`px-2 py-1 rounded text-[10px] font-bold border uppercase inline-block
@@ -369,9 +352,7 @@ const ProductsView = () => {
                         </span>
                       </td>
                       <td className="p-4 text-center">
-                        <div className="flex justify-center gap-2">
-                          <button className="p-2 rounded-lg hover:bg-orange-500/10 hover:text-orange-500 text-gray-400 transition-colors"><Edit size={18} /></button>
-                        </div>
+                        <button className="text-gray-400 hover:text-white"><Edit size={18}/></button>
                       </td>
                     </tr>
                   );
@@ -381,7 +362,7 @@ const ProductsView = () => {
           </div>
         )}
         {!loading && filteredProducts.length === 0 && (
-           <div className="text-center py-12 text-gray-500"><Package size={48} className="mx-auto mb-3 opacity-50"/><p>No se encontraron productos.</p></div>
+            <div className="text-center py-12 text-gray-500"><Package size={48} className="mx-auto mb-3 opacity-50"/><p>No se encontraron productos.</p></div>
         )}
       </div>
 
@@ -410,42 +391,8 @@ const ProductsView = () => {
   );
 };
 
-// --- COMPONENTE: CONFIGURACIÓN ---
-const ConfigView = () => {
-  const [loadingSave, setLoadingSave] = useState(false);
-  const handleSave = () => {
-    setLoadingSave(true);
-    setTimeout(() => { setLoadingSave(false); alert("Configuración guardada exitosamente"); }, 1500);
-  };
-  return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-      <div className="flex justify-between items-center mb-8">
-        <div><h2 className="text-4xl font-brand text-white">Configuración</h2><p className="text-gray-400 text-sm">Ajustes generales de la tienda y el sistema.</p></div>
-        <button onClick={handleSave} className="bg-orange-500 hover:bg-orange-600 font-bold flex items-center gap-2 text-sm px-8 py-3 rounded-lg shadow-lg shadow-orange-500/20 transition-all" disabled={loadingSave}>
-          {loadingSave ? <RefreshCw className="animate-spin" size={18}/> : <Save size={18}/>} {loadingSave ? 'Guardando...' : 'Guardar Cambios'}
-        </button>
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white/5 p-6 rounded-2xl border border-white/10">
-          <h3 className="font-brand text-2xl text-white mb-6 flex items-center gap-2"><Store size={22} className="text-yellow-400"/> Perfil de Tienda</h3>
-          <div className="space-y-4">
-            <div><label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Nombre de la Tienda</label><input type="text" defaultValue="El Cairo Bicicletas" className="w-full bg-black/20 border border-white/10 rounded-xl p-3 text-white focus:border-orange-500 outline-none transition-colors"/></div>
-          </div>
-        </div>
-        <div className="bg-white/5 p-6 rounded-2xl border border-white/10">
-          <h3 className="font-brand text-2xl text-white mb-6 flex items-center gap-2"><Truck size={22} className="text-orange-500"/> Logística</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div><label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Costo Envío</label><input type="number" defaultValue="5000" className="w-full bg-black/20 border border-white/10 rounded-xl p-3 text-white focus:border-orange-500 outline-none"/></div>
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
-// --- COMPONENTE: MODAL DE CREACIÓN (CORREGIDO PARA BACKEND CLOUDINARY) ---
+// --- COMPONENTE: MODAL DE CREACIÓN (INTEGRADO CON IMAGE UPLOADER) ---
 const CreateProductModal = ({ isOpen, onClose, onSave }) => {
-  // 1. ESTADOS PRINCIPALES
   const [type, setType] = useState('Bicicleta');
   const [loading, setLoading] = useState(false);
   const [formDataState, setFormDataState] = useState({
@@ -456,15 +403,8 @@ const CreateProductModal = ({ isOpen, onClose, onSave }) => {
   });
   const [touched, setTouched] = useState({});
 
-  // 2. ESTADO PARA IMAGEN (Archivo físico)
-  const [imageFile, setImageFile] = useState(null);
-  const [preview, setPreview] = useState("");
-  
-  // NOTA: Ya no necesitamos CLOUD_NAME ni UPLOAD_PRESET aquí porque el Backend se encarga.
-
   if (!isOpen) return null;
 
-  // --- MANEJADORES ---
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormDataState(prev => ({ ...prev, [name]: value }));
@@ -475,19 +415,8 @@ const CreateProductModal = ({ isOpen, onClose, onSave }) => {
     setTouched(prev => ({ ...prev, [name]: true }));
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImageFile(file);
-      setPreview(URL.createObjectURL(file));
-    }
-  };
-
-  // Guardar (Submit) - AHORA CON FORMDATA
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validar campos básicos
     if (!formDataState.codigo || !formDataState.descripcion || !formDataState.precioPublico || !formDataState.stock) {
       alert("Por favor completa los campos obligatorios (*)");
       setTouched({ codigo: true, descripcion: true, precioPublico: true, stock: true });
@@ -497,26 +426,19 @@ const CreateProductModal = ({ isOpen, onClose, onSave }) => {
     setLoading(true);
 
     try {
-      // 1. CREAMOS EL FORMDATA (El "sobre" virtual)
       const data = new FormData();
-
-      // 2. Agregamos los campos básicos
       data.append('Codigo', formDataState.codigo);
       data.append('Descripcion', formDataState.descripcion);
       data.append('PrecioPublico', formDataState.precioPublico);
-      data.append('PrecioCosto', Number(formDataState.precioPublico) * 0.7); // Cálculo automático
+      data.append('PrecioCosto', Number(formDataState.precioPublico) * 0.7);
       data.append('Stock', formDataState.stock);
       data.append('Activo', true);
       
-      // 3. Lógica de Imagen: ¿Archivo o URL?
-      if (imageFile) {
-        // "ImagenArchivo" debe coincidir con la propiedad IFormFile en tu DTO del Backend
-        data.append('ImagenArchivo', imageFile); 
-      } else if (formDataState.imagenUrl) {
+      // SOLO ENVIAMOS LA URL (SI EXISTE)
+      if (formDataState.imagenUrl) {
         data.append('ImagenUrl', formDataState.imagenUrl);
       }
 
-      // 4. Agregamos campos específicos según el tipo
       let endpoint = '';
       if (type === 'Bicicleta') {
         endpoint = '/Bicicletas';
@@ -533,26 +455,18 @@ const CreateProductModal = ({ isOpen, onClose, onSave }) => {
       } else {
         endpoint = '/Indumentaria';
         data.append('Talle', formDataState.talle || '');
-        data.append('Color', formDataState.color || '');
         data.append('Genero', formDataState.genero || '');
         data.append('TipoPrenda', formDataState.tipoPrenda || '');
       }
 
-      // 5. Enviar al Backend
-      // Axios detectará que es FormData y pondrá el header multipart/form-data automáticamente
-      // pero NO debemos forzar 'Content-Type': 'application/json'
       const token = localStorage.getItem('token'); 
-      
       await axios.post(`${BASE_URL}${endpoint}`, data, { 
-        headers: { 
-            Authorization: `Bearer ${token}`
-            // Nota: No agregamos Content-Type aquí para que Axios lo maneje
-        } 
+        headers: { Authorization: `Bearer ${token}` } 
       });
 
       alert("¡Producto creado exitosamente!");
-      onSave(); // Recargar lista en el padre
-      onClose(); // Cerrar modal
+      onSave(); 
+      onClose(); 
 
     } catch (error) {
       console.error(error);
@@ -565,15 +479,12 @@ const CreateProductModal = ({ isOpen, onClose, onSave }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
       <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-[#0f0f0f] w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 p-0 shadow-2xl relative">
-        
-        {/* Header Modal */}
         <div className="sticky top-0 z-10 bg-black/50 backdrop-blur-xl border-b border-white/10 p-6 flex justify-between items-center">
           <h2 className="text-2xl font-brand text-white flex items-center gap-2"><Plus className="text-orange-500"/> Nuevo Producto</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-full"><X size={24}/></button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-8 space-y-8">
-          
           {/* Selector de TIPO */}
           <div className="flex p-1 bg-white/5 rounded-xl border border-white/10">
             {['Bicicleta', 'Repuesto', 'Indumentaria'].map(t => (
@@ -584,40 +495,26 @@ const CreateProductModal = ({ isOpen, onClose, onSave }) => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-            
             {/* COLUMNA IZQUIERDA: IMAGEN */}
             <div className="md:col-span-4 space-y-4">
               <label className="block text-xs font-bold text-gray-500 uppercase">Imagen del Producto</label>
               
-              {/* Área de carga */}
-              <div className="relative group">
-                <input type="file" accept="image/*" onChange={handleFileChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"/>
-                
-                <div className="border-2 border-dashed border-white/10 rounded-xl p-6 flex flex-col items-center justify-center text-center group-hover:border-orange-500/50 group-hover:bg-white/5 transition-all min-h-40 overflow-hidden relative">
-                   {preview ? (
-                     <img src={preview} alt="Vista previa" className="absolute inset-0 w-full h-full object-cover" />
-                   ) : (
-                     <>
-                       <div className="bg-white/5 p-3 rounded-full mb-3 group-hover:scale-110 transition-transform"><Upload size={24} className="text-orange-500"/></div>
-                       <p className="text-sm text-gray-300 font-medium">Click para subir imagen</p>
-                     </>
-                   )}
-                </div>
+              <div className="bg-white/5 p-3 rounded-xl border border-white/10">
+                  <ImageUploader 
+                      onImageUpload={(url) => setFormDataState(prev => ({ ...prev, imagenUrl: url }))} 
+                  />
               </div>
 
-              {/* Botón para quitar imagen */}
-              {preview && (
-                <button type="button" onClick={() => { setImageFile(null); setPreview(""); }} className="text-xs text-red-400 flex items-center gap-1 hover:underline">
-                  <Trash2 size={12}/> Quitar imagen
-                </button>
-              )}
-
-              {/* Input URL opcional (Fallback) */}
               <div className="relative">
                  <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none"><ImageIcon size={14} className="text-gray-600"/></div>
-                 <input name="imagenUrl" placeholder="O pega URL externa..." value={formDataState.imagenUrl} onChange={handleChange} className="w-full bg-black/20 border border-white/10 rounded-lg py-2 pl-9 pr-3 text-xs text-white focus:border-orange-500 focus:outline-none placeholder-gray-700"/>
+                 <input 
+                    name="imagenUrl" 
+                    placeholder="URL..." 
+                    value={formDataState.imagenUrl} 
+                    readOnly 
+                    className="w-full bg-black/20 border border-white/10 rounded-lg py-2 pl-9 pr-3 text-xs text-gray-400 focus:outline-none cursor-not-allowed"
+                 />
               </div>
-              <p className="text-[10px] text-gray-500 text-center">Si subes un archivo, la URL escrita será ignorada.</p>
             </div>
 
             {/* COLUMNA DERECHA: CAMPOS */}
@@ -626,10 +523,7 @@ const CreateProductModal = ({ isOpen, onClose, onSave }) => {
               <div className="md:col-span-2"><Input name="descripcion" label="Nombre / Descripción" value={formDataState.descripcion} onChange={handleChange} onBlur={handleBlur} required error={touched.descripcion && !formDataState.descripcion} /></div>
               <Input name="precioPublico" label="Precio Venta ($)" type="number" value={formDataState.precioPublico} onChange={handleChange} required error={touched.precioPublico && !formDataState.precioPublico} />
               <Input name="stock" label="Stock Inicial" type="number" value={formDataState.stock} onChange={handleChange} required error={touched.stock && !formDataState.stock} />
-              
               <div className="col-span-2 h-px bg-white/10 my-2"></div>
-
-              {/* CAMPOS CONDICIONALES */}
               <AnimatePresence mode='wait'>
                 {type === 'Bicicleta' && (
                   <motion.div key="bici" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="col-span-2 grid grid-cols-2 gap-4">
@@ -671,7 +565,7 @@ const CreateProductModal = ({ isOpen, onClose, onSave }) => {
   );
 };
 
-// --- HELPER INPUT ---
+// --- HELPER COMPONENTS ---
 const Input = ({ label, error, type = "text", ...props }) => (
   <div className="w-full">
     <label className={`block text-xs font-bold uppercase mb-1.5 transition-colors ${error ? 'text-red-400' : 'text-gray-500'}`}>{label} {props.required && <span className="text-orange-500">*</span>}</label>
@@ -679,8 +573,6 @@ const Input = ({ label, error, type = "text", ...props }) => (
     {error && <p className="text-[10px] text-red-400 mt-1 font-medium">Requerido</p>}
   </div>
 );
-
-// --- OTROS AUXILIARES ---
 const SidebarItem = ({ icon, label, active, onClick }) => (
   <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group ${active ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20 font-bold' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}>
     <span className={`${active ? 'text-white' : 'text-gray-500 group-hover:text-yellow-400'} transition-colors`}>{icon}</span><span className="text-sm">{label}</span>
@@ -691,9 +583,17 @@ const StatCard = ({ title, value, icon, color }) => (
     <div className={`p-3 rounded-xl bg-white/5 ${color}`}>{icon}</div><div><p className="text-xs text-gray-400 font-bold uppercase tracking-wider">{title}</p><p className="text-2xl font-brand text-white">{value}</p></div>
   </div>
 );
+const ConfigView = () => (
+  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+    <div className="flex justify-between items-center mb-8">
+      <div><h2 className="text-4xl font-brand text-white">Configuración</h2><p className="text-gray-400 text-sm">Ajustes generales.</p></div>
+    </div>
+    <div className="bg-white/5 p-6 rounded-2xl border border-white/10"><h3 className="font-brand text-2xl text-white mb-6 flex items-center gap-2"><Store size={22} className="text-yellow-400"/> Datos de Tienda</h3></div>
+  </motion.div>
+);
 const PlaceholderView = ({ title, desc, icon }) => (
   <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center h-[60vh] text-center border-2 border-dashed border-white/10 rounded-3xl bg-white/5">
-    <div className="p-6 bg-cairo-dark rounded-full mb-4 text-orange-500 shadow-lg shadow-orange-500/10">{icon}</div><h2 className="text-4xl font-brand text-white mb-2">{title}</h2><p className="text-gray-400 max-w-md">{desc}</p>
+    <div className="p-6 bg-[#0a0a0a] rounded-full mb-4 text-orange-500 shadow-lg shadow-orange-500/10">{icon}</div><h2 className="text-4xl font-brand text-white mb-2">{title}</h2><p className="text-gray-400 max-w-md">{desc}</p>
   </motion.div>
 );
 

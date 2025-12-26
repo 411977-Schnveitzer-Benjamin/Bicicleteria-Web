@@ -30,8 +30,4 @@
     		<Watch Include="**\wwwroot\**" Watch="false" />
   	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Services\" />
-	</ItemGroup>
-
 </Project>

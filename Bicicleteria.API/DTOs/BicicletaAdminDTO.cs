@@ -1,4 +1,6 @@
-﻿namespace Bicicleteria.API.DTOs
+﻿using Microsoft.AspNetCore.Http;
+
+namespace Bicicleteria.API.DTOs
 {
     public class BicicletaAdminDTO
     {
@@ -10,7 +12,6 @@
         public int? Stock { get; set; }
         public string Moneda { get; set; } = "ARS";
         public bool Activo { get; set; } = true;
-        public IFormFile? ImagenArchivo { get; set; }
         public string? imagenUrl { get; set; }
         public string? Rodado { get; set; }
         public string? Velocidades { get; set; }

@@ -1,9 +1,11 @@
 ﻿using Bicicleteria.API.DTOs;
 using Bicicleteria.API.Interfaces; // O Repositories.Interfaces
 using Bicicleteria.API.Models;
+using Bicicleteria.API.Services;
 using Bicicleteria.API.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bicicleteria.API.Controllers
 {
@@ -69,46 +71,41 @@ namespace Bicicleteria.API.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Administrador")]
-        public async Task<ActionResult> Create([FromForm] BicicletaAdminDTO dto) // <--- CAMBIO CLAVE: [FromForm]
+        public async Task<IActionResult> Post([FromForm] BicicletaAdminDTO dto)
         {
-            // 1. Verificación de duplicados
-            bool existe = await _repository.ExistsAsync(x => x.Codigo == dto.Codigo);
-            if (existe) return BadRequest("El código ya existe.");
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            string urlFinal = dto.imagenUrl; // Por defecto, usa la URL si viene escrita
-
-            // 2. LÓGICA DE CLOUDINARY
-            // Si viene un archivo físico, lo subimos y pisamos la URL
-            if (dto.ImagenArchivo != null && dto.ImagenArchivo.Length > 0)
-            {
-                // "bicicletas" es la carpeta en tu Cloudinary
-                urlFinal = await _cloudinary.SubirImagen(dto.ImagenArchivo, "bicicletas");
-            }
-            // Opcional: Si puso una URL externa y quieres guardarla en TU Cloudinary
-            else if (!string.IsNullOrEmpty(dto.imagenUrl) && !dto.imagenUrl.Contains("cloudinary"))
-            {
-                // Descomenta si quieres re-subir URLs externas:
-                // urlFinal = await _cloudinaryService.SubirImagenPorUrl(dto.ImagenUrl, "bicicletas");
-            }
-
-            // 3. Mapeo
             var nuevaBici = new Bicicleta
             {
+                // Campos obligatorios
                 Codigo = dto.Codigo,
                 Descripcion = dto.Descripcion,
                 PrecioPublico = dto.PrecioPublico,
                 PrecioCosto = dto.PrecioCosto,
-                Stock = dto.Stock ?? 0,
-                Rodado = dto.Rodado,
-                Marca = dto.Marca,
-                Color = dto.Color,
-                imagenUrl = urlFinal, // <--- Usamos la URL que nos devolvió Cloudinary
+                Stock = dto.Stock,
+                FechaAlta = DateTime.Now,
                 Activo = true,
-                FechaAlta = DateTime.Now
+
+                // --- CORRECCIÓN CLAVE ---
+                // Si el string viene con datos, lo guardamos. Si no, NULL.
+                imagenUrl = !string.IsNullOrEmpty(dto.imagenUrl) ? dto.imagenUrl : null,
+                // ------------------------ 
+
+                // Campos específicos de Bici
+                Marca = dto.Marca,
+                Rodado = dto.Rodado,
+                Velocidades = dto.Velocidades,
+                Color = dto.Color,
+                Frenos = dto.Frenos ?? "V-Brake"
             };
 
+            // USAMOS EL REPOSITORIO, NO EL CONTEXTO DIRECTO
             await _repository.AddAsync(nuevaBici);
-            return Ok(new { message = "Bicicleta creada exitosamente", imagen = urlFinal });
+
+            // Asumiendo que tu repositorio hace SaveChanges internamente.
+            // Si tu repositorio no hace SaveChanges, deberías llamar a _unitOfWork.Complete() o similar.
+
+            return Ok(new { message = "Bicicleta creada", id = nuevaBici.BicicletaId });
         }
 
         // PUT: api/Bicicletas/5

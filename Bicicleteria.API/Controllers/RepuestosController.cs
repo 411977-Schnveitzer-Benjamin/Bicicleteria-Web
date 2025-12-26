@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Bicicleteria.API.Models;
+﻿using Bicicleteria.API.DTOs;
 using Bicicleteria.API.Interfaces;
-using Bicicleteria.API.DTOs;
+using Bicicleteria.API.Models;
+using Bicicleteria.API.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Bicicleteria.API.Controllers
 {
@@ -11,6 +12,7 @@ namespace Bicicleteria.API.Controllers
     public class RepuestosController : ControllerBase
     {
         private readonly IGenericRepository<Repuesto> _repository;
+        private readonly ICloudinaryService _cloudinary;
 
         public RepuestosController(IGenericRepository<Repuesto> repository)
         {
@@ -37,31 +39,40 @@ namespace Bicicleteria.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create(RepuestoAdminDTO dto)
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> Post([FromForm] RepuestoAdminDTO dto)
         {
-            // 1. Validación
-            bool existe = await _repository.ExistsAsync(r => r.Codigo == dto.Codigo);
-            if (existe)
-                return BadRequest(new { title = "Código Duplicado", message = $"El código '{dto.Codigo}' ya existe en Repuestos." });
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            // 2. Mapeo
-            var nuevo = new Repuesto
+            var nuevoRepuesto = new Repuesto
             {
+                // Campos obligatorios
                 Codigo = dto.Codigo,
                 Descripcion = dto.Descripcion,
                 PrecioPublico = dto.PrecioPublico,
                 PrecioCosto = dto.PrecioCosto,
-                Stock = dto.Stock ?? 0,
-                imagenUrl = dto.imagenUrl,
+                Stock = dto.Stock,
+                FechaAlta = DateTime.Now,
+                Activo = true,
+
+                // --- CORRECCIÓN CLAVE ---
+                // Si el string viene con datos, lo guardamos. Si no, NULL.
+                imagenUrl = !string.IsNullOrEmpty(dto.imagenUrl) ? dto.imagenUrl : null,
+                // ------------------------ 
+
+                // Campos específicos de Bici
                 Categoria = dto.Categoria,
                 Compatibilidad = dto.Compatibilidad,
                 MarcaComponente = dto.MarcaComponente,
-                Activo = true,
-                FechaAlta = DateTime.Now
             };
 
-            await _repository.AddAsync(nuevo);
-            return Ok(new { message = "Repuesto creado" });
+            // USAMOS EL REPOSITORIO, NO EL CONTEXTO DIRECTO
+            await _repository.AddAsync(nuevoRepuesto);
+
+            // Asumiendo que tu repositorio hace SaveChanges internamente.
+            // Si tu repositorio no hace SaveChanges, deberías llamar a _unitOfWork.Complete() o similar.
+
+            return Ok(new { message = "Repuesto creado", id = nuevoRepuesto.RepuestoId });
         }
 
         [HttpPut("{id}")]
