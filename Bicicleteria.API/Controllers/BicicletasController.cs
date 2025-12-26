@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Bicicleteria.API.Models;
+﻿using Bicicleteria.API.DTOs;
 using Bicicleteria.API.Interfaces; // O Repositories.Interfaces
-using Bicicleteria.API.DTOs;
+using Bicicleteria.API.Models;
+using Bicicleteria.API.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Bicicleteria.API.Controllers
 {
@@ -11,6 +12,7 @@ namespace Bicicleteria.API.Controllers
     public class BicicletasController : ControllerBase
     {
         private readonly IGenericRepository<Bicicleta> _repository;
+        private readonly ICloudinaryService _cloudinary;
 
         public BicicletasController(IGenericRepository<Bicicleta> repository)
         {
@@ -65,19 +67,31 @@ namespace Bicicleteria.API.Controllers
             return Ok(dto);
         }
 
-        // POST: api/Bicicletas
         [HttpPost]
         [Authorize(Roles = "Administrador")]
-        public async Task<ActionResult> Create(BicicletaAdminDTO dto)
+        public async Task<ActionResult> Create([FromForm] BicicletaAdminDTO dto) // <--- CAMBIO CLAVE: [FromForm]
         {
-            // 1. VERIFICACIÓN DE DUPLICADOS
+            // 1. Verificación de duplicados
             bool existe = await _repository.ExistsAsync(x => x.Codigo == dto.Codigo);
-            if (existe)
+            if (existe) return BadRequest("El código ya existe.");
+
+            string urlFinal = dto.imagenUrl; // Por defecto, usa la URL si viene escrita
+
+            // 2. LÓGICA DE CLOUDINARY
+            // Si viene un archivo físico, lo subimos y pisamos la URL
+            if (dto.ImagenArchivo != null && dto.ImagenArchivo.Length > 0)
             {
-                return BadRequest(new { title = "Código Duplicado", message = $"El código '{dto.Codigo}' ya está en uso en otra bicicleta." });
+                // "bicicletas" es la carpeta en tu Cloudinary
+                urlFinal = await _cloudinary.SubirImagen(dto.ImagenArchivo, "bicicletas");
+            }
+            // Opcional: Si puso una URL externa y quieres guardarla en TU Cloudinary
+            else if (!string.IsNullOrEmpty(dto.imagenUrl) && !dto.imagenUrl.Contains("cloudinary"))
+            {
+                // Descomenta si quieres re-subir URLs externas:
+                // urlFinal = await _cloudinaryService.SubirImagenPorUrl(dto.ImagenUrl, "bicicletas");
             }
 
-            // 2. Mapeo de DTO a Entidad
+            // 3. Mapeo
             var nuevaBici = new Bicicleta
             {
                 Codigo = dto.Codigo,
@@ -85,16 +99,16 @@ namespace Bicicleteria.API.Controllers
                 PrecioPublico = dto.PrecioPublico,
                 PrecioCosto = dto.PrecioCosto,
                 Stock = dto.Stock ?? 0,
-                imagenUrl = dto.imagenUrl,
                 Rodado = dto.Rodado,
                 Marca = dto.Marca,
                 Color = dto.Color,
+                imagenUrl = urlFinal, // <--- Usamos la URL que nos devolvió Cloudinary
                 Activo = true,
                 FechaAlta = DateTime.Now
             };
 
             await _repository.AddAsync(nuevaBici);
-            return Ok(new { message = "Bicicleta creada exitosamente" });
+            return Ok(new { message = "Bicicleta creada exitosamente", imagen = urlFinal });
         }
 
         // PUT: api/Bicicletas/5

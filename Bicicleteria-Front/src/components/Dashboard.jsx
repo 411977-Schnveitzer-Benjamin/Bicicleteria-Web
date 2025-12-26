@@ -443,12 +443,12 @@ const ConfigView = () => {
   );
 };
 
-// --- COMPONENTE: MODAL DE CREACIÓN (COMPLETO Y CORREGIDO) ---
+// --- COMPONENTE: MODAL DE CREACIÓN (CORREGIDO PARA BACKEND CLOUDINARY) ---
 const CreateProductModal = ({ isOpen, onClose, onSave }) => {
   // 1. ESTADOS PRINCIPALES
   const [type, setType] = useState('Bicicleta');
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formDataState, setFormDataState] = useState({
     codigo: '', descripcion: '', precioPublico: '', stock: '', imagenUrl: '',
     rodado: '', velocidades: '', marca: '', color: '', 
     categoria: '', compatibilidad: '', 
@@ -456,19 +456,18 @@ const CreateProductModal = ({ isOpen, onClose, onSave }) => {
   });
   const [touched, setTouched] = useState({});
 
-  // 2. ESTADOS PARA IMAGEN (Cloudinary)
+  // 2. ESTADO PARA IMAGEN (Archivo físico)
   const [imageFile, setImageFile] = useState(null);
   const [preview, setPreview] = useState("");
   
-  const CLOUD_NAME = 'dawjsvwjo'; 
-  const UPLOAD_PRESET = 'bicicleteria_preset'; 
+  // NOTA: Ya no necesitamos CLOUD_NAME ni UPLOAD_PRESET aquí porque el Backend se encarga.
 
   if (!isOpen) return null;
 
   // --- MANEJADORES ---
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormDataState(prev => ({ ...prev, [name]: value }));
   };
 
   const handleBlur = (e) => {
@@ -484,33 +483,12 @@ const CreateProductModal = ({ isOpen, onClose, onSave }) => {
     }
   };
 
-  const uploadToCloudinary = async () => {
-    if (!imageFile) return ""; 
-
-    const data = new FormData();
-    data.append("file", imageFile);
-    data.append("upload_preset", UPLOAD_PRESET);
-
-    try {
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
-        method: "POST",
-        body: data
-      });
-      const fileData = await res.json();
-      return fileData.secure_url;
-    } catch (error) {
-      console.error("Error subiendo imagen:", error);
-      alert("Error al subir la imagen a la nube.");
-      throw error;
-    }
-  };
-
-  // Guardar (Submit)
+  // Guardar (Submit) - AHORA CON FORMDATA
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     // Validar campos básicos
-    if (!formData.codigo || !formData.descripcion || !formData.precioPublico || !formData.stock) {
+    if (!formDataState.codigo || !formDataState.descripcion || !formDataState.precioPublico || !formDataState.stock) {
       alert("Por favor completa los campos obligatorios (*)");
       setTouched({ codigo: true, descripcion: true, precioPublico: true, stock: true });
       return;
@@ -519,56 +497,57 @@ const CreateProductModal = ({ isOpen, onClose, onSave }) => {
     setLoading(true);
 
     try {
-      // 1. Subir imagen (si existe)
-      let finalUrl = formData.imagenUrl;
+      // 1. CREAMOS EL FORMDATA (El "sobre" virtual)
+      const data = new FormData();
+
+      // 2. Agregamos los campos básicos
+      data.append('Codigo', formDataState.codigo);
+      data.append('Descripcion', formDataState.descripcion);
+      data.append('PrecioPublico', formDataState.precioPublico);
+      data.append('PrecioCosto', Number(formDataState.precioPublico) * 0.7); // Cálculo automático
+      data.append('Stock', formDataState.stock);
+      data.append('Activo', true);
+      
+      // 3. Lógica de Imagen: ¿Archivo o URL?
       if (imageFile) {
-        finalUrl = await uploadToCloudinary();
+        // "ImagenArchivo" debe coincidir con la propiedad IFormFile en tu DTO del Backend
+        data.append('ImagenArchivo', imageFile); 
+      } else if (formDataState.imagenUrl) {
+        data.append('ImagenUrl', formDataState.imagenUrl);
       }
 
-      // 2. Preparar Payload (Convertir números y asignar URL)
-      const payload = {
-        Codigo: formData.codigo,
-        Descripcion: formData.descripcion,
-        PrecioPublico: Number(formData.precioPublico),
-        PrecioCosto: Number(formData.precioPublico) * 0.7, // Calculado automático
-        Stock: Number(formData.stock),
-        ImagenUrl: finalUrl,
-        Activo: true,
-        Moneda: 'ARS'
-      };
-
-      // 3. Agregar campos específicos según el tipo
+      // 4. Agregamos campos específicos según el tipo
       let endpoint = '';
       if (type === 'Bicicleta') {
         endpoint = '/Bicicletas';
-        Object.assign(payload, { 
-           Rodado: formData.rodado, 
-           Velocidades: formData.velocidades, 
-           Marca: formData.marca, 
-           Color: formData.color,
-           Frenos: formData.frenos || 'V-Brake'
-        });
+        data.append('Rodado', formDataState.rodado || '');
+        data.append('Velocidades', formDataState.velocidades || '');
+        data.append('Marca', formDataState.marca || '');
+        data.append('Color', formDataState.color || '');
+        data.append('Frenos', formDataState.frenos || 'V-Brake');
       } else if (type === 'Repuesto') {
         endpoint = '/Repuestos';
-        Object.assign(payload, { 
-           Categoria: formData.categoria, 
-           Compatibilidad: formData.compatibilidad, 
-           MarcaComponente: formData.marca 
-        });
+        data.append('Categoria', formDataState.categoria || '');
+        data.append('Compatibilidad', formDataState.compatibilidad || '');
+        data.append('MarcaComponente', formDataState.marca || '');
       } else {
         endpoint = '/Indumentaria';
-        Object.assign(payload, { 
-           Talle: formData.talle, 
-           Color: formData.color, 
-           Genero: formData.genero, 
-           TipoPrenda: formData.tipoPrenda 
-        });
+        data.append('Talle', formDataState.talle || '');
+        data.append('Color', formDataState.color || '');
+        data.append('Genero', formDataState.genero || '');
+        data.append('TipoPrenda', formDataState.tipoPrenda || '');
       }
 
-      // 4. Enviar al Backend
+      // 5. Enviar al Backend
+      // Axios detectará que es FormData y pondrá el header multipart/form-data automáticamente
+      // pero NO debemos forzar 'Content-Type': 'application/json'
       const token = localStorage.getItem('token'); 
-      await axios.post(`${BASE_URL}${endpoint}`, payload, { 
-        headers: { Authorization: `Bearer ${token}` } 
+      
+      await axios.post(`${BASE_URL}${endpoint}`, data, { 
+        headers: { 
+            Authorization: `Bearer ${token}`
+            // Nota: No agregamos Content-Type aquí para que Axios lo maneje
+        } 
       });
 
       alert("¡Producto creado exitosamente!");
@@ -633,19 +612,20 @@ const CreateProductModal = ({ isOpen, onClose, onSave }) => {
                 </button>
               )}
 
-              {/* Input URL opcional */}
+              {/* Input URL opcional (Fallback) */}
               <div className="relative">
                  <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none"><ImageIcon size={14} className="text-gray-600"/></div>
-                 <input name="imagenUrl" placeholder="O pega URL externa..." value={formData.imagenUrl} onChange={handleChange} className="w-full bg-black/20 border border-white/10 rounded-lg py-2 pl-9 pr-3 text-xs text-white focus:border-orange-500 focus:outline-none placeholder-gray-700"/>
+                 <input name="imagenUrl" placeholder="O pega URL externa..." value={formDataState.imagenUrl} onChange={handleChange} className="w-full bg-black/20 border border-white/10 rounded-lg py-2 pl-9 pr-3 text-xs text-white focus:border-orange-500 focus:outline-none placeholder-gray-700"/>
               </div>
+              <p className="text-[10px] text-gray-500 text-center">Si subes un archivo, la URL escrita será ignorada.</p>
             </div>
 
             {/* COLUMNA DERECHA: CAMPOS */}
             <div className="md:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input name="codigo" label="Código (SKU)" value={formData.codigo} onChange={handleChange} onBlur={handleBlur} required error={touched.codigo && !formData.codigo} />
-              <div className="md:col-span-2"><Input name="descripcion" label="Nombre / Descripción" value={formData.descripcion} onChange={handleChange} onBlur={handleBlur} required error={touched.descripcion && !formData.descripcion} /></div>
-              <Input name="precioPublico" label="Precio Venta ($)" type="number" value={formData.precioPublico} onChange={handleChange} required error={touched.precioPublico && !formData.precioPublico} />
-              <Input name="stock" label="Stock Inicial" type="number" value={formData.stock} onChange={handleChange} required error={touched.stock && !formData.stock} />
+              <Input name="codigo" label="Código (SKU)" value={formDataState.codigo} onChange={handleChange} onBlur={handleBlur} required error={touched.codigo && !formDataState.codigo} />
+              <div className="md:col-span-2"><Input name="descripcion" label="Nombre / Descripción" value={formDataState.descripcion} onChange={handleChange} onBlur={handleBlur} required error={touched.descripcion && !formDataState.descripcion} /></div>
+              <Input name="precioPublico" label="Precio Venta ($)" type="number" value={formDataState.precioPublico} onChange={handleChange} required error={touched.precioPublico && !formDataState.precioPublico} />
+              <Input name="stock" label="Stock Inicial" type="number" value={formDataState.stock} onChange={handleChange} required error={touched.stock && !formDataState.stock} />
               
               <div className="col-span-2 h-px bg-white/10 my-2"></div>
 
@@ -653,25 +633,25 @@ const CreateProductModal = ({ isOpen, onClose, onSave }) => {
               <AnimatePresence mode='wait'>
                 {type === 'Bicicleta' && (
                   <motion.div key="bici" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="col-span-2 grid grid-cols-2 gap-4">
-                    <Input name="marca" label="Marca" value={formData.marca} onChange={handleChange} />
-                    <Input name="rodado" label="Rodado" value={formData.rodado} onChange={handleChange} />
-                    <Input name="velocidades" label="Velocidades" value={formData.velocidades} onChange={handleChange} />
-                    <Input name="color" label="Color" value={formData.color} onChange={handleChange} />
+                    <Input name="marca" label="Marca" value={formDataState.marca} onChange={handleChange} />
+                    <Input name="rodado" label="Rodado" value={formDataState.rodado} onChange={handleChange} />
+                    <Input name="velocidades" label="Velocidades" value={formDataState.velocidades} onChange={handleChange} />
+                    <Input name="color" label="Color" value={formDataState.color} onChange={handleChange} />
                   </motion.div>
                 )}
                 {type === 'Repuesto' && (
                   <motion.div key="rep" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="col-span-2 grid grid-cols-2 gap-4">
-                    <Input name="categoria" label="Categoría" value={formData.categoria} onChange={handleChange} />
-                    <Input name="compatibilidad" label="Compatibilidad" value={formData.compatibilidad} onChange={handleChange} />
-                    <Input name="marca" label="Marca Componente" value={formData.marca} onChange={handleChange} />
+                    <Input name="categoria" label="Categoría" value={formDataState.categoria} onChange={handleChange} />
+                    <Input name="compatibilidad" label="Compatibilidad" value={formDataState.compatibilidad} onChange={handleChange} />
+                    <Input name="marca" label="Marca Componente" value={formDataState.marca} onChange={handleChange} />
                   </motion.div>
                 )}
                 {type === 'Indumentaria' && (
                   <motion.div key="ind" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="col-span-2 grid grid-cols-2 gap-4">
-                    <Input name="tipoPrenda" label="Tipo de Prenda" value={formData.tipoPrenda} onChange={handleChange} />
-                    <Input name="talle" label="Talle" value={formData.talle} onChange={handleChange} />
-                    <Input name="genero" label="Género" value={formData.genero} onChange={handleChange} />
-                    <Input name="color" label="Color" value={formData.color} onChange={handleChange} />
+                    <Input name="tipoPrenda" label="Tipo de Prenda" value={formDataState.tipoPrenda} onChange={handleChange} />
+                    <Input name="talle" label="Talle" value={formDataState.talle} onChange={handleChange} />
+                    <Input name="genero" label="Género" value={formDataState.genero} onChange={handleChange} />
+                    <Input name="color" label="Color" value={formDataState.color} onChange={handleChange} />
                   </motion.div>
                 )}
               </AnimatePresence>
