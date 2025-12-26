@@ -1,11 +1,13 @@
-using Microsoft.EntityFrameworkCore;
-using Bicicleteria.API.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using Microsoft.OpenApi.Models;
-using Bicicleteria.API.Repositories;
 using Bicicleteria.API.Interfaces;
+using Bicicleteria.API.Models;
+using Bicicleteria.API.Repositories;
+using Bicicleteria.API.Services;
+using Bicicleteria.API.Services.Interface;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Text;
 using System.Text.Json.Serialization; // <--- 1. IMPORTANTE: Agrega este using
 
 var builder = WebApplication.CreateBuilder(args);
@@ -73,6 +75,8 @@ builder.Services.AddCors(options =>
            .AllowAnyMethod();
     });
 });
+
+builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 
 var app = builder.Build();
 
